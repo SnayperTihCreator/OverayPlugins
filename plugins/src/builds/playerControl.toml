@@ -1,0 +1,14 @@
+[plugin]
+name = "PlayerControl"
+version = "1.0.0"
+author = "SnayperTihCreator"
+description = "Плагин для эмититации быстрых клавишь для мулти/медиа"
+
+[settings]
+tools_dir = "tools"
+
+[exclude]
+dirs = ["__pycache__", ".git", "temp"]
+files = [".*", "*.tmp"]
+plugin_dirs = ["icons"]
+plugin_files = ["*.qrc", "*.ui"]
