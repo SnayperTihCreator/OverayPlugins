@@ -29,37 +29,31 @@ class PlayerControl(DraggableWindow):
         self.btn_next_track = QPushButton()
         self.btn_next_track.setIconSize(sizeIcon)
         self.btn_next_track.pressed.connect(
-            lambda: self.sender_media(PlayerCode.NEXT_TRACK)
+            lambda: self.send_media_key(PlayerCode.NEXT_TRACK)
         )
         
         self.btn_prev_track = QPushButton()
         self.btn_prev_track.setIconSize(sizeIcon)
         self.btn_prev_track.pressed.connect(
-            lambda: self.sender_media(PlayerCode.PREV_TRACK)
+            lambda: self.send_media_key(PlayerCode.PREV_TRACK)
         )
         
         self.btn_vol_up = QPushButton()
         self.btn_vol_up.setIconSize(sizeIcon)
         self.btn_vol_up.pressed.connect(
-            lambda: self.sender_media1(PlayerCode.VOLUME_UP)
-        )
-        self.btn_vol_up.released.connect(
-            lambda: self.sender_media2(PlayerCode.VOLUME_UP)
+            lambda: self.send_media_key(PlayerCode.VOLUME_UP)
         )
         
         self.btn_vol_down = QPushButton()
         self.btn_vol_down.setIconSize(sizeIcon)
         self.btn_vol_down.pressed.connect(
-            lambda: self.sender_media1(PlayerCode.VOLUME_DOWN)
-        )
-        self.btn_vol_down.released.connect(
-            lambda: self.sender_media2(PlayerCode.VOLUME_DOWN)
+            lambda: self.send_media_key(PlayerCode.VOLUME_DOWN)
         )
         
         self.btn_vol_mute = QPushButton()
         self.btn_vol_mute.setIconSize(sizeIcon)
         self.btn_vol_mute.pressed.connect(
-            lambda: self.sender_media(PlayerCode.VOLUME_MUTE)
+            lambda: self.send_media_key(PlayerCode.VOLUME_MUTE)
         )
         
         self.box.addWidget(self.btn_next_track)
@@ -100,15 +94,9 @@ class PlayerControl(DraggableWindow):
     def set_state_play_pause(self, state):
         icon = self.getIcon("play" if not state else "pause", self.config.icons.modulate)
         self.btn_play_pause.setIcon(icon)
-    
-    def sender_media(self, key_code):
-        fakeInput.send_key(key_code)
-    
-    def sender_media1(self, key_code):
-        fakeInput.send_press_key(key_code)
-    
-    def sender_media2(self, key_code):
-        fakeInput.send_up_key(key_code)
+        
+    def send_media_key(self, keycode):
+        fakeInput.send_key(keycode)
     
     def toggle_play_pause(self):
         self.runs = True
