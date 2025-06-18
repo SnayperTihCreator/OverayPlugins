@@ -1,6 +1,6 @@
 [plugin]
 name = "PowerWidget"
-version = "1.0.0"
+version = "1.0.3"
 author = "SnayperTihCreator"
 description = "Окно с статусом зарядки"
 

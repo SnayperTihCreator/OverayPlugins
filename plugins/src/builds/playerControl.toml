@@ -1,6 +1,6 @@
 [plugin]
 name = "PlayerControl"
-version = "1.0.0"
+version = "1.3.0"
 author = "SnayperTihCreator"
 description = "Плагин для эмититации быстрых клавишь для мулти/медиа"
 

@@ -1,0 +1,7 @@
+[window]
+width = 200
+height = 75
+styleFile = "style.css"
+opacity = 0.75
+[tasks]
+path="plugin:/tasks.yml"

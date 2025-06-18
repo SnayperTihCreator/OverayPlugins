@@ -194,3 +194,4 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 /plugins/src/tools/
+/temp/
