@@ -6,6 +6,7 @@ from API import Config, OverlayWidget, saveResource, loadResource
 from .uis.main_ui import Ui_ManagerTask
 from .dialogCreateTask import CreateDialogTask
 from .tasks import Task, TaskStatus
+from .dialogAction import DialogAction
 
 
 class ManagerTask(OverlayWidget, Ui_ManagerTask):
@@ -114,7 +115,8 @@ class ManagerTask(OverlayWidget, Ui_ManagerTask):
         actions = {
             "delete": menu.addAction("Delete Task"),
             "cancel": menu.addAction("Cancel Task"),
-            "restart": menu.addAction("Restart Task")
+            "restart": menu.addAction("Restart Task"),
+            "show_action": menu.addAction("Show actions")
         }
         
         action = menu.exec(self.tableWidget.mapToGlobal(pos))
@@ -128,6 +130,9 @@ class ManagerTask(OverlayWidget, Ui_ManagerTask):
         elif action == actions["restart"]:
             task.restart()
             self._update_task_status(row, task.status)
+        elif action == actions["show_action"]:
+            dialog = DialogAction(task.actions, self)
+            dialog.show()
     
     def loader(self):
         """Загрузка сохраненных задач"""
