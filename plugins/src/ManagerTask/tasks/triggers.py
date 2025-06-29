@@ -118,8 +118,7 @@ class RelativeDateTimeTrigger(BaseTrigger):
     
     @property
     def description(self):
-        status = "Active" if self.start_time else "Inactive"
-        return f"Trigger after {self.delta} ({status})"
+        return f"Trigger after {self.delta}"
 
 
 __all__ = [
