@@ -1,8 +1,4 @@
-#CentralWidget {{
-    border-radius: 20px;
+QLabel {
     font: 15px bold !important;
-}}
-
-QLabel {{
-    font: 15px bold !important;
-}}
+    background-color: transparent;
+}

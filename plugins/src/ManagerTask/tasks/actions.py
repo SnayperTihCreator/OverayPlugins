@@ -1,10 +1,10 @@
 from enum import Enum, auto
 from typing import Any
-
 import yaml
 from attrs import define, field
+from PySide6.QtCore import Signal
 
-from .core import ABCObject, registry_from_yaml, registry_to_yaml
+from .core import QABCObject, registry_to_yaml, registry_from_yaml
 from .baseTriggers import BaseTrigger
 from .baseExecutor import BaseExecutor
 
@@ -26,45 +26,66 @@ class ActionStatus(Enum):
         return cls(int(data))
 
 
-registry_to_yaml(yaml.SafeDumper, ActionStatus, ActionStatus.to_yaml)
-registry_from_yaml(yaml.SafeLoader, "!ActionStatus", ActionStatus.from_yaml)
+registry_to_yaml(ActionStatus, ActionStatus.to_yaml)
+registry_from_yaml("!ActionStatus", ActionStatus.from_yaml)
 
 
-@define
-class Action(ABCObject):
+@define(slots=False)
+class Action(QABCObject):
+    """Упрощённая реализация Action с Qt-интеграцией"""
+    
+    # Qt сигналы
+    status_changed = Signal(ActionStatus)
+    error_occurred = Signal(str)
+    
     executor: BaseExecutor = field()
     trigger: BaseTrigger = field()
     status: ActionStatus = field(default=ActionStatus.IDLE, init=False)
+    _error: str = field(default=None, init=False)
+    _result: Any = field(default=None, init=False)
     
-    _error: str = field(repr=False, init=False, default=None)
-    _result: Any = field(repr=False, init=False, default=None)
+    def __attrs_post_init__(self):
+        super().__init__()  # Инициализация QObject
     
     def cancel(self):
+        """Оригинальная логика с сигналами"""
         self.trigger.stop()
-        self.status = ActionStatus.CANCELLED
-        
-    def clear(self):
-        self.trigger.clear()
-        self.executor.clear()
+        self._update_status(ActionStatus.CANCELLED)
     
-    def update(self, *args, **kwargs):
-        if self.status in [ActionStatus.SUCCESS, ActionStatus.FAILED]:
+    def restart(self):
+        self.trigger.stop()
+        self.executor.clear()
+        self._error = ""
+        self._result = None
+        self._update_status(ActionStatus.IDLE)
+    
+    def update(self):
+        if self.is_finish():
             return
         
         if self.status == ActionStatus.IDLE:
-            self.status = ActionStatus.RUNNING
+            self._update_status(ActionStatus.RUNNING)
+            self.trigger.start()
         
-        if self.trigger.check(*args, **kwargs):
-            try:
-                self.executor.execute(*args, **kwargs)
-                self._result = self.executor.result_execute
-                self.status = ActionStatus.SUCCESS
-            except Exception as e:
-                self._error = str(e)
+        if self.trigger():
+            success = self.executor()
+            self._result = self.executor.result
+            self._error = self.executor.error
+            self._update_status(ActionStatus.SUCCESS if success else ActionStatus.CANCELLED)
+            
+            if self._error:
                 self.status = ActionStatus.FAILED
-                
-    def is_compiled(self):
-        return self.status in [ActionStatus.SUCCESS, ActionStatus.FAILED]
+                self.error_occurred.emit(self._error)
+    
+    def _update_status(self, new_status):
+        """Обновление статуса с уведомлением"""
+        if self.status != new_status:
+            self.status = new_status
+            self.status_changed.emit(new_status)
+    
+    # Оригинальные методы без изменений
+    def is_finish(self):
+        return self.status in {ActionStatus.SUCCESS, ActionStatus.FAILED, ActionStatus.CANCELLED}
     
     def get_error(self):
         return self._error
@@ -76,6 +97,7 @@ class Action(ABCObject):
     def restore(cls, data):
         obj = cls(data["executor"], data["trigger"])
         obj.status = data["status"]
+        obj._error = data.get("error")
         return obj
     
     def save(self):
@@ -83,5 +105,5 @@ class Action(ABCObject):
             "executor": self.executor,
             "trigger": self.trigger,
             "status": self.status,
-            "error": str(self._error)
+            "error": self._error
         }

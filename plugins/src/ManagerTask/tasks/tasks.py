@@ -1,9 +1,9 @@
 from enum import Enum, auto
-
 import yaml
 from attrs import define, field
+from PySide6.QtCore import Signal
 
-from .core import ABCObject, registry_from_yaml, registry_to_yaml
+from .core import QABCObject, registry_to_yaml, registry_from_yaml
 from .actions import Action, ActionStatus
 
 
@@ -12,7 +12,6 @@ class TaskStatus(Enum):
     ACTIVE = auto()
     COMPLETED = auto()
     PARTIAL = auto()
-    PARTIAL_WITH_ERROR = auto()
     ABORTED = auto()
     
     @classmethod
@@ -25,65 +24,90 @@ class TaskStatus(Enum):
         return cls(int(data))
 
 
-registry_to_yaml(yaml.SafeDumper, TaskStatus, TaskStatus.to_yaml)
-registry_from_yaml(yaml.SafeLoader, "!TaskStatus", TaskStatus.from_yaml)
+registry_to_yaml(TaskStatus, TaskStatus.to_yaml)
+registry_from_yaml("!TaskStatus", TaskStatus.from_yaml)
 
 
-@define
-class Task(ABCObject):
+@define(slots=False)
+class Task(QABCObject):
+    """Реализация Task с сохранением оригинальной логики и Qt-интеграцией"""
+    
+    # Сигналы состояния
+    status_changed = Signal(object)  # TaskStatus
+    
     name: str = field()
-    uid: int = field()
+    uid: str = field()
     actions: list[Action] = field(factory=list)
+    priority: int = field(default=0)
+    
     status: TaskStatus = field(default=TaskStatus.IDLE, init=False)
     
-    def update(self, *args, **kwargs):
-        if self.status in [TaskStatus.COMPLETED, TaskStatus.PARTIAL_WITH_ERROR, TaskStatus.PARTIAL]:
+    def __attrs_post_init__(self):
+        super().__init__()
+    
+    def _update_status(self, new_status):
+        """Обновление статуса с уведомлением"""
+        if self.status != new_status:
+            self.status = new_status
+            self.status_changed.emit(new_status)
+    
+    def update(self):
+        if self.is_finish():
             return
         
         if self.status == TaskStatus.IDLE:
-            self.status = TaskStatus.ACTIVE
-            for action in self.actions:
-                action.clear()
+            self._update_status(TaskStatus.ACTIVE)
         
+        # Обновляем все действия
         for action in self.actions:
-            action.update(*args, **kwargs)
-            
-        compiled = 0
-        skipped = 0
-        failed = 0
+            action.update()
+        
+        # Анализ результатов
+        compiled = skipped = failed = 0
         for action in self.actions:
             if action.status == ActionStatus.SUCCESS:
                 compiled += 1
-            if action.status == ActionStatus.CANCELLED:
+            elif action.status == ActionStatus.CANCELLED:
                 skipped += 1
-            if action.status == ActionStatus.FAILED:
+            elif action.status == ActionStatus.FAILED:
                 failed += 1
+        
+        # Определение общего статуса
         if compiled == len(self.actions):
-            self.status = TaskStatus.COMPLETED
-        if compiled+skipped == len(self.actions):
-            self.status = TaskStatus.PARTIAL
-        if compiled+skipped+failed == len(self.actions):
-            self.status = TaskStatus.PARTIAL_WITH_ERROR
+            self._update_status(TaskStatus.COMPLETED)
+        elif compiled + skipped + failed == len(self.actions):
+            self._update_status(TaskStatus.PARTIAL)
     
     def cancel(self):
+        """Отмена задачи"""
+        self._update_status(TaskStatus.ABORTED)
         for action in self.actions:
             action.cancel()
-        self.status = TaskStatus.ABORTED
-        
-    def is_compiled(self):
-        return self.status in [TaskStatus.PARTIAL_WITH_ERROR, TaskStatus.PARTIAL, TaskStatus.COMPLETED]
+    
+    def restart(self):
+        """Перезапуск задачи"""
+        for action in self.actions:
+            action.restart()
+        self._update_status(TaskStatus.IDLE)
+    
+    def is_finish(self):
+        """Проверка завершенности задачи"""
+        return self.status in {TaskStatus.PARTIAL,
+                               TaskStatus.COMPLETED,
+                               TaskStatus.ABORTED}
     
     @classmethod
     def restore(cls, data):
-        obj = cls(data["name"], data["uid"])
-        obj.actions = data["actions"].copy()
-        obj.status = data["status"]
+        """Восстановление из сохраненных данных"""
+        obj = cls(data["name"], data["uid"], data["actions"].copy())
+        obj.status = TaskStatus(data["status"])
         return obj
     
     def save(self):
+        """Сохранение состояния задачи"""
         return {
             "name": self.name,
             "uid": self.uid,
             "actions": self.actions.copy(),
-            "status": self.status
+            "status": self.status,
         }

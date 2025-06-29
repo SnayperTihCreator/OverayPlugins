@@ -1,8 +1,9 @@
-#CentralWidget {{
-    border-radius: 20px;
-    font: 15px bold !important;
-}}
-
-QPushButton {{
+QPushButton {
+    background-color: transparent;
     border: none;
-}}
+}
+
+QLabel {
+    font: 15px bold !important;
+    background-color: transparent;
+}

@@ -2,35 +2,35 @@ from abc import ABCMeta, abstractmethod
 from typing import Self
 
 import yaml
+from PySide6.QtCore import QObject
 
 
-def registry_to_yaml(dumper: type[yaml.Dumper], data_type, to_yaml):
-    dumper.add_representer(data_type, to_yaml)
+def registry_to_yaml(data_type, to_yaml):
+    yaml.SafeDumper.add_representer(data_type, to_yaml)
 
 
-def registry_from_yaml(loaders: list[type[yaml.Loader]] | type[yaml.Loader], tag, from_yaml):
-    if isinstance(loaders, list):
-        for loader in loaders:
-            loader.add_constructor(tag, from_yaml)
-    else:
-        loaders.add_constructor(tag, from_yaml)
+def registry_from_yaml(tag, from_yaml):
+    yaml.SafeLoader.add_constructor(tag, from_yaml)
 
 
-class MetaABCObject(ABCMeta):
-    yaml_dumper: type[yaml.Dumper]
-    yaml_loader: list[type[yaml.Loader]] | type[yaml.Loader]
+class MetaABCObject(ABCMeta, type(QObject)):
     
     def __init__(cls, name, bases, namespace):
-        super().__init__(name, bases, namespace)
-        registry_to_yaml(cls.yaml_dumper, cls, cls.to_yaml)
-        registry_from_yaml(cls.yaml_loader, f"!{cls.__module__}.{name}", cls.from_yaml)
+        type(QObject).__init__(cls, name, bases, namespace)
+        ABCMeta.__init__(cls, name, bases, namespace)
+        
+        registry_to_yaml(cls, cls.to_yaml)
+        registry_from_yaml(f"!{cls.__module__}.{name}", cls.from_yaml)
 
 
-class ABCObject(metaclass=MetaABCObject):
+class QABCObject(QObject, metaclass=MetaABCObject):
     yaml_flow_style = None
     
     yaml_loader = yaml.SafeLoader
     yaml_dumper = yaml.SafeDumper
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
     
     @classmethod
     def from_yaml(cls, loader: yaml.Loader, node):

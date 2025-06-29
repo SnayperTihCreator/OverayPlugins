@@ -132,6 +132,7 @@ class Virtualization(DraggableWindow):
         self.timer.start(30)  # Обновление ~30 FPS
     
     def updateData(self):
+        if not self.isVisible(): return
         # Чтение аудиоданных
         if self.stream is None: return
         

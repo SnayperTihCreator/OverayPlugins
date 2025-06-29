@@ -65,6 +65,7 @@ class PlayerControl(DraggableWindow):
         self.box.addWidget(self.btn_vol_mute)
         
         self.header = QPushButton()
+        self.header.setObjectName("Header")
         self.header.setIconSize(QSize(20, 20))
         self.header.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         
