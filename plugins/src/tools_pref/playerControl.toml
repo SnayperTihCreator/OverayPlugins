@@ -1,4 +1,5 @@
 [plugin]
-path="C:\\Users\\MSI\\Documents\\Python\\OverayPlugins\\plugins\\src\\PlayerControl"
+path="plugins\\src\\PlayerControl"
 [build]
 exclude = ["*/icons/*", "*.qrc"]
+[platform]

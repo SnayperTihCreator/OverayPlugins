@@ -1,4 +1,5 @@
 [plugin]
-path="C:\\Users\\MSI\\Documents\\Python\\OverayPlugins\\plugins\\src\\ClockDateWidget"
+path="plugins\\src\\ClockDateWidget"
 [build]
 exclude = []
+[platform]

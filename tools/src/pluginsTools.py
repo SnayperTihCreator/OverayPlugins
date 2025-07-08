@@ -1,19 +1,19 @@
 import typer
-import zipfile
 import os
-import re
-from pathlib import Path
 import toml
-from typing import List, Optional
+from typing import Optional
+
+from build_plugin import build_plugin
+from compress_plugin import compress_plugin
+from uncompress_plugin import uncompress_plugin
 
 app = typer.Typer()
 
 
-from build_plugin import build_plugin
-@app.command()
-def BuildPlugin(
+@app.command(name="build-plugin")
+def buildplugin(
         plugin_name_or_toml: str = typer.Argument(..., help="Имя плагина или путь к TOML файлу"),
-        exclude: Optional[List[str]] = typer.Option(
+        exclude: Optional[list[str]] = typer.Option(
             None,
             help="Регулярные выражения для исключения файлов/папок"
         ),
@@ -42,15 +42,39 @@ def BuildPlugin(
         exclude_patterns = exclude or []
     
     exclude_patterns += ["*/__pycache__/*", "*/.git/*", "*/temp/*", "*.tmp"]
-        
+    
     zip_filename = build_plugin(plugin_name, exclude_patterns, output_dir)
     
     typer.echo(f"Плагин {plugin_name} успешно собран в {zip_filename}")
+    
+    return zip_filename, plugin_name, exclude_patterns, output_dir
+    
 
 
-@app.command()
-def passed():
-    pass
+@app.command("compress-plugin")
+def compressplugin(
+        plugin_toml: str = typer.Argument(..., help="путь к TOML файлу"),
+        output_dir: str = typer.Option(
+            ".",
+            help="Директория для сохранения zip-файла"
+        )
+):
+    data = toml.load(open(plugin_toml, "r", encoding="utf-8"))
+    _, plugin_name, _, build_dir = buildplugin(plugin_toml, None, "plugins/compres")
+    zip_filename = compress_plugin(plugin_name, build_dir, output_dir, data)
+    typer.echo(f"Пакет плагина {plugin_name} успешно собран в {zip_filename}")
+
+@app.command("uncompress-plugin")
+def uncompressplugin(
+    archive: str = typer.Argument(..., help="Путь до файла .plugin"),
+    output_dir: str = typer.Option(
+        ".",
+        help="Директория приложения"
+    )
+):
+    uncompress_plugin(archive, output_dir)
+    typer.echo(f"Пакет плагина {archive} успешно распакован в {output_dir}")
+
 
 if __name__ == "__main__":
     app()

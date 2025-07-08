@@ -1,4 +1,5 @@
 [plugin]
-path="C:\\Users\\MSI\\Documents\\Python\\OverayPlugins\\plugins\\src\\ManagerTask"
+path="plugins\\src\\ManagerTask"
 [build]
 exclude = ["*.ui", "*.yml"]
+[platform]

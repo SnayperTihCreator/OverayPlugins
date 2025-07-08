@@ -1,4 +1,6 @@
 [plugin]
-path="C:\\Users\\MSI\\Documents\\Python\\OverayPlugins\\plugins\\src\\VirtualizationWidget"
+path="plugins\\src\\VirtualizationWidget"
 [build]
 exclude = []
+[platform]
+available = ["win32"]

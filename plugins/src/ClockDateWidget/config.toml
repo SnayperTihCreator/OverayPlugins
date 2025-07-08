@@ -2,7 +2,7 @@
 width = 200
 height = 75
 styleFile = "style.css"
-opacity = 0.75
+opacity = 1
 [clockFormat]
 dateFormat = "%d/%m/%Y"
 timeFormat = "%H:%M:%S"

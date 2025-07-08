@@ -1,4 +1,5 @@
 [plugin]
-path="C:\\Users\\MSI\\Documents\\Python\\OverayPlugins\\plugins\\src\\PowerWidget"
+path="plugins\\src\\PowerWidget"
 [build]
 exclude = []
+[platform]
