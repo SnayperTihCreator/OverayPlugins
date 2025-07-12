@@ -1,0 +1,5 @@
+[plugin]
+path="plugins\\src\\VolumeControl"
+[build]
+exclude = []
+[platform]

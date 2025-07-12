@@ -6,6 +6,8 @@ from API.PluginSetting import PluginSettingWindow
 
 
 class DraggableWindow(QMainWindow, APIBaseWidget):
+    central_widget: QWidget
+    config: Config
     """
     Перетаскиваемое окно с прозрачным фоном и возможностью настройки стилей.
 
