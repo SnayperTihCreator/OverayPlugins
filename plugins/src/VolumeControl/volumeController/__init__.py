@@ -37,7 +37,7 @@ class VolumeController(BaseVolumeHandler):
     def close(self):
         self.handler.close()
     
-    def start_monitoring(self, callback: Callable[[], None]):
+    def start_monitoring(self, callback: Callable[[Application, dict], None]):
         self.handler.start_monitoring(callback)
     
     def stop_monitoring(self):
@@ -47,4 +47,4 @@ class VolumeController(BaseVolumeHandler):
         return self.handler.update()
     
     
-__all__ = ["VolumeController", "Application", "SystemVolume"]
+__all__ = ["VolumeController", "Application", "SystemVolume", "BaseVolumeHandler"]

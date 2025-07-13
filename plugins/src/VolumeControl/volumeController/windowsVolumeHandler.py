@@ -38,7 +38,7 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         self.session_manager = cast(interface, POINTER(IAudioSessionManager2))
         self._handler_session = None
         
-        self._callback = None
+        self._callback = lambda *args: print(args, "inner")
     
     def loadSession(self):
         for session in AudioUtilities.GetAllSessions():
@@ -71,23 +71,26 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         self.stop_monitoring()
         self.gaps.clear()
     
-    def start_monitoring(self, callback: Callable[[], None]):
+    def start_monitoring(self, callback: Callable[[Application, dict], None]):
         self._callback = callback
         # self._handler_session = AudioSessionNotifier(self._handle_audio_event)
         # self.session_manager.RegisterSessionNotification(self._handler_session)
         
     def _handle_audio_event(self, pid, event_type, *args):
-        print(pid, event_type, args)
+        match event_type:
+            case "volume_changed":
+                self._callback(self.gaps[pid], {"volume": round(args[0], 2), "muted": bool(args[1])})
+            case "system_volume_changed":
+                self._callback(self.gaps[-1], {"volume": round(self.gaps[-1].volume, 2), "muted": self.gaps[-1].mute})
+            case _:
+                print(pid, event_type, args)
     
     def stop_monitoring(self):
         self._callback = None
         # self.session_manager.UnregisterSessionNotification(self._handler_session)
     
     def update(self) -> bool:
-        sessions = AudioUtilities.GetAllSessions()
-        
-        if len(sessions) == (len(self.gaps)-1): return False
-        for session in sessions:
+        for session in AudioUtilities.GetAllSessions():
             if session.ProcessId in self.gaps: continue
             
             self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, session)

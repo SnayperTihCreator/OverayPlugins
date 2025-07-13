@@ -10,43 +10,39 @@ class Application:
     pid: int
     _session: Any = field(repr=False)
     
+    def _on_get_mute(self):
+        pass
+    
+    def _on_set_mute(self, value):
+        pass
+    
     @property
     def mute(self):
-        return bool(self._session.SimpleAudioVolume.GetMute())
+        return self._on_get_mute()
     
     @mute.setter
     def mute(self, value):
-        self._session.SimpleAudioVolume.SetMute(value, None)
+        self._on_set_mute(value)
+        
+    def _on_get_volume(self):
+        pass
+    
+    def _on_set_volume(self, value):
+        pass
     
     @property
     def volume(self):
-        return self._session.SimpleAudioVolume.GetMasterVolume()
+        return self._on_get_volume()
     
     @volume.setter
     def volume(self, value):
-        self._session.SimpleAudioVolume.SetMasterVolume(value, None)
+        self._on_set_volume(value)
 
 
 @define
 class SystemVolume(Application):
     pid: int = field(default=-1, init=False, repr=False)
     name: str = field(default="System", init=False)
-    
-    @property
-    def mute(self):
-        return bool(self._session.GetMute())
-    
-    @mute.setter
-    def mute(self, value):
-        self._session.SetMute(value, None)
-    
-    @property
-    def volume(self):
-        return self._session.GetMasterVolumeLevelScalar()
-    
-    @volume.setter
-    def volume(self, value):
-        self._session.SetMasterVolumeLevelScalar(value, None)
 
 
 class BaseVolumeHandler(ABC):
@@ -63,7 +59,7 @@ class BaseVolumeHandler(ABC):
         pass
     
     @abstractmethod
-    def set_application_mute(self, app_id: str, muted: bool):
+    def set_application_mute(self, app_id: int, muted: bool):
         """Включить/выключить звук приложения"""
         pass
     

@@ -32,13 +32,31 @@ class Application(core.Application):
     callback: Callable = field(default=None, init=False, repr=False)
     _handler: Any = field(default=None, init=False, repr=False)
     
+    _is_program_change: bool = field(default=False, init=False, repr=False)
+    
     def __attrs_post_init__(self):
         self._handler = AudioSessionEventHandler(self._on_event_session)
         self._session._ctl.RegisterAudioSessionNotification(self._handler)
     
     def _on_event_session(self, *args):
-        if self.callback is not None:
+        if (self.callback is not None) and not self._is_program_change:
             self.callback(self.pid, *args)
+        if self._is_program_change:
+            self._is_program_change = False
+    
+    def _on_get_mute(self):
+        return bool(self._session.SimpleAudioVolume.GetMute())
+    
+    def _on_set_mute(self, value):
+        self._is_program_change = True
+        self._session.SimpleAudioVolume.SetMute(value, None)
+    
+    def _on_get_volume(self):
+        return self._session.SimpleAudioVolume.GetMasterVolume()
+    
+    def _on_set_volume(self, value):
+        self._is_program_change = True
+        self._session.SimpleAudioVolume.SetMasterVolume(value, None)
 
 
 class AudioEndpointCallback(COMObject):
@@ -64,3 +82,17 @@ class SystemVolume(core.SystemVolume, Application):
     def __del__(self):
         if self._session and self._handler:
             self._session.UnregisterControlChangeNotify(self._handler)
+    
+    def _on_get_mute(self):
+        return bool(self._session.GetMute())
+    
+    def _on_set_mute(self, value):
+        self._is_program_change = True
+        self._session.SetMute(value, None)
+        
+    def _on_get_volume(self):
+        return self._session.GetMasterVolumeLevelScalar()
+    
+    def _on_set_volume(self, value):
+        self._is_program_change = True
+        self._session.SetMasterVolumeLevelScalar(value, None)

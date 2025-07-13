@@ -1,10 +1,10 @@
 from enum import IntEnum, auto
 
-from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, QSize
-from PySide6.QtWidgets import QStyledItemDelegate, QStyle, QSlider, QStyleOptionViewItem
+from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, QSize, QEvent, QPoint
+from PySide6.QtWidgets import QStyledItemDelegate, QStyle, QSlider, QStyleOptionViewItem, QToolTip, QLabel
 from PySide6.QtGui import QPalette
 
-from .volumeController import Application, SystemVolume
+from .volumeController import Application, SystemVolume, BaseVolumeHandler
 
 __all__ = ["VolumeListModel", "VolumeItemDelegate"]
 
@@ -13,14 +13,24 @@ class VolumeItemRole(IntEnum):
     VOLUME = Qt.ItemDataRole.UserRole
     MUTED = auto()
     IS_SYSTEM = auto()
+    CONTROLLER = auto()
 
 
 class VolumeListModel(QAbstractListModel):
     def __init__(self, volume_handler, parent=None):
         super().__init__(parent)
-        self.volume_handler = volume_handler
+        self.volume_handler: BaseVolumeHandler = volume_handler
         self.apps: list[Application] = []
         self.refresh()
+        # self.volume_handler.start_monitoring(self._on_change_value)
+    
+    def on_change_value(self, volume: Application, params):
+        try:
+            idx = self.apps.index(volume)
+            index = self.createIndex(idx, 0)
+            self.dataChanged.emit(index, index, [VolumeItemRole.VOLUME, VolumeItemRole.MUTED])
+        except IndexError:
+            pass
     
     def rowCount(self, parent=QModelIndex()) -> int:
         return len(self.apps)
@@ -39,6 +49,8 @@ class VolumeListModel(QAbstractListModel):
             return app.volume * 100
         elif role == VolumeItemRole.IS_SYSTEM:  # Muted
             return isinstance(app, SystemVolume)
+        elif role == VolumeItemRole.CONTROLLER:
+            return app
         return None
     
     def setData(self, index: QModelIndex, value, role: int = Qt.EditRole) -> bool:
@@ -48,11 +60,11 @@ class VolumeListModel(QAbstractListModel):
         app = self.apps[index.row()]
         
         if role == VolumeItemRole.VOLUME:  # Volume
-            app.volume = value / 100
+            self.volume_handler.set_application_volume(app.pid, value / 100)
             self.dataChanged.emit(index, index, [VolumeItemRole.VOLUME])
             return True
         elif role == VolumeItemRole.MUTED:  # Muted
-            app.mute = value
+            self.volume_handler.set_application_mute(app.pid, value)
             self.dataChanged.emit(index, index, [VolumeItemRole.MUTED])
             return True
         
@@ -63,8 +75,21 @@ class VolumeListModel(QAbstractListModel):
     
     def refresh(self):
         self.beginResetModel()
+        self.volume_handler.update()
         self.apps = self.volume_handler.get_applications()
         self.endResetModel()
+    
+    def getApplication(self, index: QModelIndex) -> Application:
+        return self.data(index, VolumeItemRole.CONTROLLER)
+
+
+class SliderPopup(QLabel):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.ToolTip | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setStyleSheet("background: rgba(0, 0, 0, 180); color: white; border-radius: 4px; padding: 2px 6px;")
+        self.hide()
 
 
 class VolumeItemDelegate(QStyledItemDelegate):
@@ -73,6 +98,8 @@ class VolumeItemDelegate(QStyledItemDelegate):
         self.slider_width = 150
         self.slider_height = 20
         self.item_height = 60
+        self.popup_slider = SliderPopup()
+        self.closeEditor.connect(lambda *args: self.popup_slider.hide())
     
     def paint(self, painter, option: QStyleOptionViewItem, index: QModelIndex):
         self.initStyleOption(option, index)
@@ -124,10 +151,28 @@ class VolumeItemDelegate(QStyledItemDelegate):
         slider.setRange(0, 100)
         slider.setSingleStep(5)
         slider.setPageStep(10)
+        
+        slider.valueChanged.connect(lambda value: self.show_popup_slider(value, slider))
+        slider.sliderPressed.connect(self.popup_slider.show)
+        slider.sliderReleased.connect(self.popup_slider.hide)
         return slider
+    
+    def show_popup_slider(self, value: int, slider: QSlider):
+        self.popup_slider.setText(str(value))
+        
+        # Позиционируем popup над ползунком
+        slider_pos = slider.mapToGlobal(QPoint(0, 0))
+        handle_x = int((slider.value() / slider.maximum()) * slider.width())
+        
+        self.popup_slider.move(
+            slider_pos.x() + handle_x - 10,
+            slider_pos.y() - slider.height()
+        )
+        self.popup_slider.show()
     
     def setEditorData(self, editor, index):
         editor.setValue(int(index.data(VolumeItemRole.VOLUME)))
+        self.popup_slider.setText(str(editor.value()))
     
     def setModelData(self, editor, model, index):
         model.setData(index, editor.value(), VolumeItemRole.VOLUME)
