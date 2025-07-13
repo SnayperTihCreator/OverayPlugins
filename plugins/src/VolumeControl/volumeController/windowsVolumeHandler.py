@@ -90,9 +90,17 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         # self.session_manager.UnregisterSessionNotification(self._handler_session)
     
     def update(self) -> bool:
+        ids = set()
         for session in AudioUtilities.GetAllSessions():
+            ids.add(session.ProcessId)
             if session.ProcessId in self.gaps: continue
             
             self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, session)
             self.gaps[session.ProcessId].callback = self._handle_audio_event
+        diedVolume = ids^set(self.gaps.keys())
+        diedVolume.remove(-1)
+        
+        if diedVolume:
+            for idx in diedVolume:
+                del self.gaps[idx]
         return True
