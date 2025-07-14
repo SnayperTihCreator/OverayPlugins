@@ -3,6 +3,7 @@ import sys
 import zipfile
 from functools import cache
 from pathlib import Path
+import os
 
 
 @cache
@@ -10,7 +11,7 @@ def getAppPath():
     return (
         Path(sys.executable).parent
         if getattr(sys, "frozen", False)
-        else Path(sys.argv[0]).parent
+        else Path(os.getcwd())
     )
 
 
@@ -34,7 +35,7 @@ class PluginPath:
         if not pluginName:
             raise ValueError("Plugin name not set!")
         relPath = virtualPath.replace("plugin_data:/", "").lstrip("/")
-        return getAppPath() / "plugins" / "pldata" / pluginName / relPath
+        return getAppPath() / "plugins" / "plugin_data" / pluginName / relPath
     
     @classmethod
     def _resolveProjectPath(cls, pluginName, virtualPath):
@@ -88,12 +89,14 @@ class FileProject:
     
     def open(self, virtualPath, mode="r"):
         """Открывает файл как встроенный open()."""
-        path = self.pathResolver.resolve(virtualPath)
+        path: Path = self.pathResolver.resolve(virtualPath)
         
         # Режим записи/дозаписи (только для реальных файлов)
         if any(c in mode for c in ('w', 'a', 'x', '+')):
             if isinstance(path, str):
                 raise PermissionError("Cannot write to files inside ZIP archives (plugin:/).")
+            if not path.parent.exists():
+                path.parent.mkdir(parents=True, exist_ok=True)
             return path.open(mode)
         
         # Чтение из ZIP

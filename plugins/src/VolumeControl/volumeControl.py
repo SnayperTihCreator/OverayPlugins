@@ -67,6 +67,12 @@ class VolumeControl(DraggableWindow):
         
         self.box.addWidget(self.btnOpenList)
         self.box.addWidget(self.btnUpdate)
+        
+        self.idTimer = self.startTimer(5000)
+        
+    def timerEvent(self, event, /):
+        if event.id().value == self.idTimer:
+            self.modelVolumeList.refresh()
     
     def act_open_volume_list(self):
         self.showingList = True
@@ -116,3 +122,17 @@ class VolumeControl(DraggableWindow):
     def showEvent(self, event, /):
         self.controller.start_monitoring(self._on_change)
         return super().showEvent(event)
+    
+    def savesConfig(self):
+        data = super().savesConfig()
+        data |= {"openList": int(self.showingList)}
+        return data
+    
+    def restoreConfig(self, config):
+        super().restoreConfig(config)
+        self.showingList = bool(int(config.openList))
+        
+        if self.showingList:
+            self.act_open_volume_list()
+        else:
+            self.act_close_volume_list()

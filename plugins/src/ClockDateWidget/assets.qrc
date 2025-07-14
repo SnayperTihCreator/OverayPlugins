@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="clock_date_widget">
+        <file alias="ClockDateWidget.qml">assets/ClockDateWidget.qml</file>
+    </qresource>
+</RCC>

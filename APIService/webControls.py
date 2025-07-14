@@ -1,10 +1,11 @@
 import asyncio
 import socket
 from contextlib import closing
+from threading import Thread
 
-from PySide6.QtCore import Signal, QThread, qDebug
 import websockets
 from websockets.asyncio.server import serve
+from websockets import exceptions as exc
 
 
 def find_free_port(start_port=8000, end_port=9000):
@@ -19,48 +20,46 @@ def find_free_port(start_port=8000, end_port=9000):
                 continue
     raise ValueError(f"No free ports in range {start_port}-{end_port}")
 
-
-class ServerWebSockets(QThread):
-    message_received = Signal(str)
-    
-    def __init__(self, ports, parent=None):
-        super().__init__(parent)
+class ServerWebSockets(Thread):
+    def __init__(self, ports, callback=None, nameServer=None):
+        super().__init__(name=nameServer, daemon=True)
+        self._callback = callback
         self.free_port = find_free_port(*ports)
         self._is_running = False
-    
-    async def handle_connection(self, websocket):
-        qDebug("Клиент подключен")
-        try:
-            async for message in websocket:
-                qDebug(f"Получено: {message}")
-                self.message_received.emit(message)
-        except websockets.exceptions.ConnectionClosed:
-            qDebug(f"Клиент отключился")
-    
-    async def run_server(self):
-        async with serve(self.handle_connection, "localhost", self.free_port) as server:
-            qDebug(f"Сервер запущен на ws://localhost:{self.free_port}")
-            self.finished.connect(server.close)
+        self._event_loop = asyncio.get_event_loop_policy().new_event_loop()
+
+    def run(self):
+        self._is_running = True
+        self._event_loop.run_until_complete(self.runner())
+
+    def is_run(self):
+        return self._is_running
+
+    def quit(self):
+        self._is_running = False
+        self._event_loop.close()
+
+
+    async def runner(self):
+        async with serve(self.handlerConnection, "localhost", self.free_port) as server:
             while self._is_running:
                 await asyncio.sleep(0.1)
-    
-    def run(self, /):
-        asyncio.run(self.run_server())
-    
-    def start(self, /, priority=QThread.Priority.InheritPriority):
-        if not self._is_running:
-            self._is_running = True
-            super().start(priority)
-    
-    def quit(self, /):
-        self._is_running = False
-        super().quit()
+
+
+    async def handlerConnection(self, wsock:websockets.ServerConnection):
+        try: 
+            async for msg in wsock:
+                self._event_loop.call_soon(self._callback, msg)
+        except exc.ConnectionClosed:
+            print("Клиент завершил")
+                
+        
+        
 
 
 class ClientWebSockets:
-    def __init__(self, ports, parent=None):
-        super().__init__(parent)
-        self.free_port = find_free_port(ports)
+    def __init__(self, port):
+        self.free_port = port
     
     def send_message(self, message):
         asyncio.run(self.run_connect(message))
@@ -69,5 +68,5 @@ class ClientWebSockets:
         await self.asend_message(message)
     
     async def asend_message(self, message):
-        async with websockets.connect(f"Сервер запущен на ws://localhost:{self.free_port}") as client:
+        async with websockets.connect(f"ws://127.0.0.1:{self.free_port}") as client:
             await client.send(message)

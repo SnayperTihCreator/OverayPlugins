@@ -1,64 +1,49 @@
-from PySide6.QtWidgets import QHBoxLayout, QWidget, QLabel
-from PySide6.QtCore import Qt
-
+from PySide6.QtCore import QTimer
 import psutil
 
-from API import Config, DraggableWindow
+from API import Config, QmlDraggableWindow
+from . import assets_rc
 
-from .BatteryWidget import BatteryWidget
 
-
-class PowerWidget(DraggableWindow):
-
+class PowerWidget(QmlDraggableWindow):
     def __init__(self, parent=None):
-        super().__init__(Config(__file__, "draggable_window"), parent)
-
-        self.box = QHBoxLayout(self.central_widget)
-
-        self.battery = BatteryWidget()
-        self.powerLevelLabel = QLabel()
-        self.powerLevelLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.powerLeftLabel = QLabel()
-        self.powerLeftLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
-        self.box.addWidget(self.battery)
-        self.box.addWidget(self.powerLevelLabel)
-        self.box.addWidget(self.powerLeftLabel)
-
-        self._lastPercent = ""
-        self._lastLeftTime = ""
-
+        super().__init__(
+            Config(__file__, "draggable_window"),
+            "qrc:/power_widget/PowerWidget.qml",
+            parent)
+        
+        self._last_percent = 0
+        self._last_left_time = ""
+        
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.updateData)
+        self.timer.start(1000)
         self.updateData()
-        self.timerID = self.startTimer(1000)
-
-    def timerEvent(self, event, /):
-        if event.id().value == self.timerID:
-            self.updateData()
-
+    
     def updateData(self):
+        super().updateData()
         battery = psutil.sensors_battery()
         if battery is None:
             return
-
+        
         percent = battery.percent
-        if (percent != self._lastPercent) or self.reloading:
-            self._lastPercent = percent
-            self.powerLevelLabel.setText(
-                self.config.powerFormat.unitFormat.replace("%u", str(percent))
-            )
-            self.battery.set_level(percent)
-        timeLeft = (
-            battery.secsleft
-            if battery.secsleft != psutil.POWER_TIME_UNLIMITED
-            else "Заряжается"
-        )
-        if (timeLeft != self._lastLeftTime) or self.reloading:
-            self._lastLeftTime = timeLeft
-            self.battery.set_charging(isinstance(timeLeft, str))
-            if (not isinstance(timeLeft, str)) and (timeLeft // 3600) > 100_000:
-                timeLeft = "Рассчитывается"
-            self.powerLeftLabel.setText(
-                f"{timeLeft if isinstance(timeLeft, str) else f'{timeLeft // 3600} ч {(timeLeft % 3600) // 60} мин'}"
-            )
-
-        super().updateData()
+        if percent != self._last_percent or self.reloading:
+            self._last_percent = percent
+            self.setRootProperty("powerLevel", percent)
+        
+        time_left = self._calculate_time_left(battery)
+        
+        if time_left != self._last_left_time or self.reloading:
+            self._last_left_time = time_left
+            self.setRootProperty("timeLeft", time_left)
+            self.setRootProperty("charging", battery.power_plugged)
+    
+    def _calculate_time_left(self, battery):
+        if battery.power_plugged:
+            return "Заряжается"
+        elif battery.secsleft == psutil.POWER_TIME_UNLIMITED:
+            return "Рассчитывается"
+        elif (battery.secsleft // 3600) > 100_000:
+            return "Рассчитывается"
+        else:
+            return f"{battery.secsleft // 3600} ч {(battery.secsleft % 3600) // 60} мин"

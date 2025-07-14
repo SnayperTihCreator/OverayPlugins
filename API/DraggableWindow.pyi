@@ -1,5 +1,10 @@
 from typing import Optional, Any
+
+from PySide6.QtQuick import QQuickItem
 from PySide6.QtWidgets import QWidget, QMainWindow
+from PySide6.QtQuickWidgets import QQuickWidget
+from PySide6.QtQml import QQmlEngine
+
 from API.config import Config
 from API.core import APIBaseWidget
 from API.PluginSetting import PluginSettingWindow
@@ -8,6 +13,7 @@ from API.PluginSetting import PluginSettingWindow
 class DraggableWindow(QMainWindow, APIBaseWidget):
     central_widget: QWidget
     config: Config
+    reloading: bool
     """
     Перетаскиваемое окно с прозрачным фоном и возможностью настройки стилей.
 
@@ -86,3 +92,17 @@ class DraggableWindow(QMainWindow, APIBaseWidget):
             PluginSettingWindow: Виджет с настройками
         """
         ...
+    
+    
+class QmlDraggableWindow(DraggableWindow):
+    central_widget: QQuickWidget
+    
+    def __init__(self, config, url, parent=None): ...
+    
+    def loadQmlContent(self, url: str): ...
+    
+    def getRootQml(self) -> QQuickItem: ...
+    
+    def setRootProperty(self, name, value): ...
+    
+    def loadPresetData(self)->QQmlEngine: ...

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 from box import Box
 from APIService.path_controls import PluginPath
+import inspect
 
 
 @dataclass
@@ -25,18 +26,20 @@ class Config:
         self._create_is_not = create_is_not
         self._default_config = getattr(Defaults, plugin_type)
         self._plugin_type = plugin_type
-        self._load_path = PluginPath(Path(path).stem)
+        plugin_name = Path(path).parent.name if ".zip" else Path(path).name
+        self._load_path = PluginPath(plugin_name)
         self._config: Box = self._load_config()
     
     def _load_config(self) -> Box[str, Any]:
         try:
-            with self.loadFile(f"{self._config_name}.toml") as f:
+            with self.loadFile(f"{self._config_name}.toml", "r") as f:
                 return Box(toml.load(f))
-        except (FileNotFoundError, toml.TomlDecodeError):
+        except (FileNotFoundError, toml.TomlDecodeError) as e:
+            print(f"{type(e)}: {e}")
             # Если файла нет или он поврежден, создаем новый с дефолтными значениями
             if self._create_is_not:
                 with self.loadFile(f"{self._config_name}.toml", "w") as f:
-                    return Box(toml.load(f))
+                    toml.dump(self._default_config, f)
             return Box(self._default_config)
     
     def loadFile(self, path, mode="r", data_storage="auto"):
@@ -48,7 +51,6 @@ class Config:
         return self._load_path.open(f"{prefix}:/{path}", mode)
     
     def __getattr__(self, item):
-        print(item)
         return getattr(self._config, item)
     
     def reload(self):

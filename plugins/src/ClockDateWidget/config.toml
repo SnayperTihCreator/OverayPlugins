@@ -1,8 +1,8 @@
 [window]
-width = 200
+width = 220
 height = 75
 styleFile = "style.css"
 opacity = 1
 [clockFormat]
-dateFormat = "%d/%m/%Y"
-timeFormat = "%H:%M:%S"
+dateFormat = "dd/MM/yyyy"
+timeFormat = "hh:mm:ss"

@@ -1,0 +1,8 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="power_widget">
+        <file alias="PowerWidget.qml">assets/PowerWidget.qml</file>
+        <file alias="BatteryItem.qml">assets/BatteryItem.qml</file>
+        <file alias="icons/lightning.png">assets/lightning.png</file>
+    </qresource>
+</RCC>
