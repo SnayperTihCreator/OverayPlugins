@@ -75,7 +75,7 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         self._callback = callback
         # self._handler_session = AudioSessionNotifier(self._handle_audio_event)
         # self.session_manager.RegisterSessionNotification(self._handler_session)
-        
+    
     def _handle_audio_event(self, pid, event_type, *args):
         match event_type:
             case "volume_changed":
@@ -94,10 +94,10 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         for session in AudioUtilities.GetAllSessions():
             ids.add(session.ProcessId)
             if session.ProcessId in self.gaps: continue
-            
+            if not (session.Process and session.Process.name()): continue
             self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, session)
             self.gaps[session.ProcessId].callback = self._handle_audio_event
-        diedVolume = ids^set(self.gaps.keys())
+        diedVolume = ids ^ set(self.gaps.keys())
         diedVolume.remove(-1)
         
         if diedVolume:
