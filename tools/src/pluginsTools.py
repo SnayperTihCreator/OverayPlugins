@@ -1,80 +1,142 @@
-import typer
+from pathlib import Path
+from typing import Literal, List
+from enum import StrEnum, auto
+
 import os
 import toml
 from typing import Optional
 
-from build_plugin import build_plugin
-from compress_plugin import compress_plugin
-from uncompress_plugin import uncompress_plugin
+# from build_plugin import build_plugin
+# from compress_plugin import compress_plugin
+# from uncompress_plugin import uncompress_plugin
+
+import typer
+
+import tools
+import utils
+
+
+class Platform(StrEnum):
+    Win32 = auto()
+    Linux = auto()
+
 
 app = typer.Typer()
 
+creator = typer.Typer()
+app.add_typer(creator, name="create")
 
-@app.command(name="build-plugin")
-def buildplugin(
-        plugin_name_or_toml: str = typer.Argument(..., help="Имя плагина или путь к TOML файлу"),
-        exclude: Optional[list[str]] = typer.Option(
-            None,
-            help="Регулярные выражения для исключения файлов/папок"
-        ),
-        output_dir: str = typer.Option(
-            ".",
-            help="Директория для сохранения zip-файла"
-        )
+
+@creator.command(name="plugin", help="Создать папку плагина")
+def createPlugin(
+        name: str = typer.Argument(..., help="Имя плагина"),
+        path: Path = typer.Argument(..., help="Путь корневой папки плагина"),
+        isWindow: bool = typer.Option(False, "--window", "-wn", help="Плавающие окно"),
+        isWidget: bool = typer.Option(False, "--widget", "-wg", help="Виджет в самом Overlay")
 ):
-    """
-    Создает zip-архив плагина:
-    - Все .py файлы помещаются в подпапку с именем плагина
-    - Остальные файлы помещаются в корень архива
-    - Поддерживает исключения через регулярные выражения
-    - Поддерживает конфигурацию через TOML файл
-    """
-    # Обработка конфигурации из TOML
-    if plugin_name_or_toml.endswith('.toml') and os.path.exists(plugin_name_or_toml):
-        with open(plugin_name_or_toml, 'r', encoding='utf-8') as f:
-            config = toml.load(f)
-        plugin_name = config.get('plugin', {}).get('path', '.')
-        exclude_patterns = config.get('build', {}).get('exclude', [])
-        if exclude:
-            exclude_patterns.extend(exclude)
-    else:
-        plugin_name = plugin_name_or_toml
-        exclude_patterns = exclude or []
-    
-    exclude_patterns += ["*/__pycache__/*", "*/.git/*", "*/temp/*", "*.tmp"]
-    
-    zip_filename = build_plugin(plugin_name, exclude_patterns, output_dir)
-    
-    typer.echo(f"Плагин {plugin_name} успешно собран в {zip_filename}")
-    
-    return zip_filename, plugin_name, exclude_patterns, output_dir
-    
+    types = []
+    if isWindow:
+        types.append("window")
+    if isWidget:
+        types.append("widget")
+    try:
+        tools.createFolderPlugin(name, path.absolute(), types)
+        typer.secho("Репозиторий плагина создан", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
 
-@app.command("compress-plugin")
-def compressplugin(
-        plugin_toml: str = typer.Argument(..., help="путь к TOML файлу"),
-        output_dir: str = typer.Option(
-            ".",
-            help="Директория для сохранения zip-файла"
-        )
+@creator.command(name="tools", help="Создать папку зависимостей")
+def createTools(
+        name: str = typer.Argument(..., help="Имя плагина"),
+        platform: Platform = typer.Argument(..., help="Платформа для зависимостей"),
+        path: Path = typer.Argument(..., help="Путь к корневой папки плагина"),
 ):
-    data = toml.load(open(plugin_toml, "r", encoding="utf-8"))
-    _, plugin_name, _, build_dir = buildplugin(plugin_toml, None, "plugins/compres")
-    zip_filename = compress_plugin(plugin_name, build_dir, output_dir, data)
-    typer.echo(f"Пакет плагина {plugin_name} успешно собран в {zip_filename}")
+    try:
+        tools.createToolsFolder(name, platform, path.absolute())
+        typer.secho(f"Папка для зависимостей:{name}\nСоздана", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
-@app.command("uncompress-plugin")
-def uncompressplugin(
-    archive: str = typer.Argument(..., help="Путь до файла .plugin"),
-    output_dir: str = typer.Option(
-        ".",
-        help="Директория приложения"
-    )
+
+@creator.command(name="build-file", help="Файл для сборки плагина в пакет")
+def createBuildFile(
+        name: str = typer.Argument(..., help="Имя плагина"),
+        path: Path = typer.Argument(..., help="Путь куда сохранить"),
+        pathplugin: Path = typer.Argument(..., help="Путь к плагину"),
+        exclude: str = typer.Argument(None, help="Все что исключить(больше одного через ';')"),
+        platforms: str = typer.Argument(None, help="Платформы(через ';')")
 ):
-    uncompress_plugin(archive, output_dir)
-    typer.echo(f"Пакет плагина {archive} успешно распакован в {output_dir}")
+    try:
+        exclude = exclude or ""
+        exclude = exclude.split(";")
+        
+        platforms = platforms or ""
+        platforms = platforms.split(";")
+        
+        tools.createBuildFile(name, pathplugin, path, platforms, exclude)
+        typer.secho(f"Создан в {path}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
+compression = typer.Typer()
+app.add_typer(compression, name="compress")
+
+
+@compression.command(name="build-plugin", help="Собрать плагин")
+def buildPlugin(
+        build_file: Path = typer.Argument(..., help="Путь к файлу сборки"),
+        path_output: Path = typer.Argument(..., help="Выходная папка"),
+        
+):
+    dataToml = utils.parseBuildFile(build_file)
+    try:
+        result = utils.buildPlugin(dataToml, path_output)
+        typer.secho(f"Плагин успешно собран {result}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
+@compression.command(name="build-pack", help="Собрать пакет")
+def buildPack(
+        build_file: Path = typer.Argument(..., help="Путь к файлу сборки", ),
+        path_output: Path = typer.Argument(..., help="Выходная папка"),
+        path_plugin: Path = typer.Argument(Path("./compress"), help="Путь к собранному плагину"),
+):
+    dataToml = utils.parseBuildFile(build_file)
+    try:
+        plugin = utils.buildPlugin(dataToml, path_plugin)
+        pack = utils.buildPack(dataToml, plugin, path_output)
+        typer.secho(f"Пакет успешно собран {pack}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+        
+@compression.command(name="unpacked", help="Распаковка пакета")
+def unpacked(
+        plugin_pack: Path = typer.Argument(..., help="Путь до пакета"),
+        path_output: Path = typer.Argument(..., help="Путь домашней паки Overlay")
+):
+    try:
+        utils.unpacked(plugin_pack, path_output)
+        typer.secho(f"Пакет успешно распакован", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+        
+
+
+#
+# @app.command("uncompress-plugin")
+# def uncompressplugin(
+#     archive: str = typer.Argument(..., help="Путь до файла .plugin"),
+#     output_dir: str = typer.Option(
+#         ".",
+#         help="Директория приложения"
+#     )
+# ):
+#     uncompress_plugin(archive, output_dir)
+#     typer.echo(f"Пакет плагина {archive} успешно распакован в {output_dir}")
 
 
 if __name__ == "__main__":
-    app()
+    app(help_option_names=["--help", "-h"])

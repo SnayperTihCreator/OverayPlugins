@@ -197,3 +197,5 @@ cython_debug/
 /temp/
 /plugins/src/Build plugin.exe
 /plugins/collected/
+/plugins/pack/
+/plugins/tools/

@@ -1,5 +1,5 @@
 [plugin]
 path="plugins\\src\\ClockDateWidget"
 [build]
-exclude = []
+exclude = ["/assets", "*.qrc"]
 [platform]

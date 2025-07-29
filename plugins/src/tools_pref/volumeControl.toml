@@ -1,5 +1,5 @@
 [plugin]
 path="plugins\\src\\VolumeControl"
 [build]
-exclude = ["*/icons/*", "*.qrc"]
+exclude = ["/icons", "*.qrc"]
 [platform]
