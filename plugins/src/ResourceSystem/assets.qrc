@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="resource_system">
+        <file alias="ResourceSystem.qml">assets/ResourceSystem.qml</file>
+    </qresource>
+</RCC>

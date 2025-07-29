@@ -1,0 +1,5 @@
+[window]
+width = 350
+height = 500
+styleFile = "style.css"
+opacity = 1
