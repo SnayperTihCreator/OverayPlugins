@@ -52,6 +52,7 @@ class VolumeControl(DraggableWindow):
         self.list_volume.setItemDelegate(self.volumeItemDegeta)
         self.list_volume.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.list_volume.customContextMenuRequested.connect(self.contextMenuOpen)
+        self.list_volume.setIconSize(QSize(64, 64))
         
         self.btnUpdate.pressed.connect(self.modelVolumeList.refresh)
         self.btnOpenList.pressed.connect(self.act_open_volume_list)
@@ -109,7 +110,7 @@ class VolumeControl(DraggableWindow):
         super().loadConfig()
         if self.showingList:
             width, height = self.config.window.width, self.config.window.height
-            self.setFixedSize(width * 2, height * 4)
+            self.setFixedSize(width * 2.5, height * 4)
     
     def hideEvent(self, event, /):
         self.controller.stop_monitoring()

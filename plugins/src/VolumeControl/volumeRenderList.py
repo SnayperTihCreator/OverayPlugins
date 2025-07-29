@@ -1,8 +1,10 @@
 from enum import IntEnum, auto
 
-from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, QSize, QEvent, QPoint
-from PySide6.QtWidgets import QStyledItemDelegate, QStyle, QSlider, QStyleOptionViewItem, QToolTip, QLabel
-from PySide6.QtGui import QPalette
+from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, QSize, QPoint, QRect
+from PySide6.QtWidgets import QStyledItemDelegate, QSlider, QStyleOptionViewItem, QLabel
+from PySide6.QtGui import QPalette, QIcon
+
+from APIService.colorize import modulateIcon
 
 from .volumeController import Application, SystemVolume, BaseVolumeHandler
 
@@ -51,6 +53,8 @@ class VolumeListModel(QAbstractListModel):
             return isinstance(app, SystemVolume)
         elif role == VolumeItemRole.CONTROLLER:
             return app
+        elif role == Qt.ItemDataRole.DecorationRole:
+            return QIcon(app.icon_path) if app.icon_path is not None else QIcon()
         return None
     
     def setData(self, index: QModelIndex, value, role: int = Qt.EditRole) -> bool:
@@ -98,6 +102,7 @@ class VolumeItemDelegate(QStyledItemDelegate):
         self.slider_width = 150
         self.slider_height = 20
         self.item_height = 60
+        self.spacing = 5
         self.popup_slider = SliderPopup()
         self.closeEditor.connect(lambda *args: self.popup_slider.hide())
     
@@ -105,14 +110,34 @@ class VolumeItemDelegate(QStyledItemDelegate):
         self.initStyleOption(option, index)
         painter.save()
         
-        # Рисуем текст (название приложения)
-        text_rect = option.rect.adjusted(5, 5, -self.slider_width - 10, -5)
-        painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, index.data(Qt.ItemDataRole.DisplayRole))
-        
-        # Рисуем слайдер громкости
         volume = index.data(VolumeItemRole.VOLUME)
         muted = index.data(VolumeItemRole.MUTED)
+        icon = index.data(Qt.ItemDataRole.DecorationRole)  # Получаем иконку
+        app_name = index.data(Qt.ItemDataRole.DisplayRole)  # Получаем название
         
+        # Область для иконки/названия
+        content_rect = option.rect.adjusted(5, 5, -self.slider_width - 10, -5)
+        icon_size = option.widget.iconSize()
+        
+        # Рисуем иконку если есть
+        current_x = content_rect.left()
+        if icon and not icon.isNull():
+            
+            icon_rect = QRect(QPoint(current_x, content_rect.top()), icon_size)
+            icon = modulateIcon(icon, option.palette.color(QPalette.ColorRole.ButtonText))
+            icon.paint(painter, icon_rect)
+            current_x += icon_size.width() + self.spacing
+        
+        # Всегда рисуем текст
+        text_rect = QRect(current_x, content_rect.top(),
+                          content_rect.right() - current_x, content_rect.height())
+        painter.drawText(text_rect, Qt.AlignLeft | Qt.AlignVCenter, app_name)
+        
+        # Устанавливаем всплывающую подсказку с названием
+        if option.widget:
+            option.widget.setToolTip(app_name)
+        
+        # Рисуем слайдер громкости (остальной код без изменений)
         slider_rect = option.rect.adjusted(
             option.rect.width() - self.slider_width - 5,
             (option.rect.height() - self.slider_height) // 2,
@@ -132,14 +157,14 @@ class VolumeItemDelegate(QStyledItemDelegate):
             painter.setBrush(option.palette.color(QPalette.ColorRole.Dark))
         else:
             painter.setBrush(option.palette.color(QPalette.ColorRole.Highlight))
-            
-            painter.drawRect(fill_rect)
-            
-            # Текст с процентом
-            text = f"{int(volume)}% {'(Muted)' if muted else ''}"
-            painter.drawText(slider_rect, Qt.AlignCenter, text)
-            
-            painter.restore()
+        
+        painter.drawRect(fill_rect)
+        
+        # Текст с процентом
+        text = f"{int(volume)}% {'(Muted)' if muted else ''}"
+        painter.drawText(slider_rect, Qt.AlignCenter, text)
+        
+        painter.restore()
     
     def sizeHint(self, option, index):
         return QSize(300, self.item_height)

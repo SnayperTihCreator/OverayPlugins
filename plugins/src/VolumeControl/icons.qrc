@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="volume_control">
         <file alias="header.png">icons/header.png</file>
+        <file alias="icons/system.png">icons/icon_system.png</file>
   </qresource>
 </RCC>

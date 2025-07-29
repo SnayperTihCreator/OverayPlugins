@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 
 from attrs import define, field
 
@@ -8,6 +8,7 @@ from attrs import define, field
 class Application:
     name: str
     pid: int
+    icon_path: Optional[str]
     _session: Any = field(repr=False)
     
     def _on_get_mute(self):

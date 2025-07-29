@@ -29,7 +29,7 @@ class WindowsVolumeHandler(BaseVolumeHandler):
         interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
         speaker_volume = cast(interface, POINTER(IAudioEndpointVolume))
         
-        self.gaps: dict[int, Application] = {-1: SystemVolume(speaker_volume)}
+        self.gaps: dict[int, Application] = {-1: SystemVolume(":/volume_control/icons/system.png", speaker_volume)}
         self.gaps[-1].callback = self._handle_audio_event
         
         self.loadSession()
@@ -43,7 +43,7 @@ class WindowsVolumeHandler(BaseVolumeHandler):
     def loadSession(self):
         for session in AudioUtilities.GetAllSessions():
             if session.Process and session.Process.name():
-                self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, session)
+                self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, None, session)
                 self.gaps[session.ProcessId].callback = self._handle_audio_event
     
     def get_applications(self) -> list[Application]:
@@ -95,12 +95,15 @@ class WindowsVolumeHandler(BaseVolumeHandler):
             ids.add(session.ProcessId)
             if session.ProcessId in self.gaps: continue
             if not (session.Process and session.Process.name()): continue
-            self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, session)
+            self.gaps[session.ProcessId] = Application(session.Process.name(), session.ProcessId, None, session)
             self.gaps[session.ProcessId].callback = self._handle_audio_event
         diedVolume = ids ^ set(self.gaps.keys())
         diedVolume.remove(-1)
         
         if diedVolume:
             for idx in diedVolume:
-                del self.gaps[idx]
+                try:
+                    del self.gaps[idx]
+                except KeyError:
+                    pass
         return True
