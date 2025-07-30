@@ -1,14 +1,9 @@
 from pathlib import Path
 from typing import Literal, List
 from enum import StrEnum, auto
-
 import os
 import toml
 from typing import Optional
-
-# from build_plugin import build_plugin
-# from compress_plugin import compress_plugin
-# from uncompress_plugin import uncompress_plugin
 
 import typer
 
@@ -24,7 +19,7 @@ class Platform(StrEnum):
 app = typer.Typer()
 
 creator = typer.Typer()
-app.add_typer(creator, name="create")
+app.add_typer(creator, name="create", help="Создание определенного формата файлов")
 
 
 @creator.command(name="plugin", help="Создать папку плагина")
@@ -80,15 +75,15 @@ def createBuildFile(
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
 
-compression = typer.Typer()
-app.add_typer(compression, name="compress")
+builder = typer.Typer()
+app.add_typer(builder, name="build", help="Сборка файлов")
 
 
-@compression.command(name="build-plugin", help="Собрать плагин")
+@builder.command(name="plugin", help="Собрать плагин")
 def buildPlugin(
         build_file: Path = typer.Argument(..., help="Путь к файлу сборки"),
         path_output: Path = typer.Argument(..., help="Выходная папка"),
-        
+
 ):
     dataToml = utils.parseBuildFile(build_file)
     try:
@@ -98,7 +93,7 @@ def buildPlugin(
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
 
-@compression.command(name="build-pack", help="Собрать пакет")
+@builder.command(name="pack", help="Собрать пакет")
 def buildPack(
         build_file: Path = typer.Argument(..., help="Путь к файлу сборки", ),
         path_output: Path = typer.Argument(..., help="Выходная папка"),
@@ -111,8 +106,9 @@ def buildPack(
         typer.secho(f"Пакет успешно собран {pack}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
-        
-@compression.command(name="unpacked", help="Распаковка пакета")
+
+
+@app.command(name="unpacked", help="Распаковка пакета")
 def unpacked(
         plugin_pack: Path = typer.Argument(..., help="Путь до пакета"),
         path_output: Path = typer.Argument(..., help="Путь домашней паки Overlay")
@@ -122,20 +118,6 @@ def unpacked(
         typer.secho(f"Пакет успешно распакован", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
-        
-
-
-#
-# @app.command("uncompress-plugin")
-# def uncompressplugin(
-#     archive: str = typer.Argument(..., help="Путь до файла .plugin"),
-#     output_dir: str = typer.Option(
-#         ".",
-#         help="Директория приложения"
-#     )
-# ):
-#     uncompress_plugin(archive, output_dir)
-#     typer.echo(f"Пакет плагина {archive} успешно распакован в {output_dir}")
 
 
 if __name__ == "__main__":
