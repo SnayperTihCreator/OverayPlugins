@@ -14,8 +14,8 @@ Item {
     
     // Дни недели
     property var weekDays: [
-        "Понедельник", "Вторник", "Среда", 
-        "Четверг", "Пятница", "Суббота", "Воскресенье"
+        "Воскресенье", "Понедельник", "Вторник", "Среда",
+        "Четверг", "Пятница", "Суббота"
     ]
     
     // Текущее время и дата
@@ -52,7 +52,7 @@ Item {
 
             Text {
                 id: weekdayLabel
-                text: weekDays[currentDateTime.getDay() - 1]
+                text: weekDays[currentDateTime.getDay()]
                 anchors.centerIn: parent
                 color: mainTextColor
             }

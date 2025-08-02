@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QColor
 from PySide6.QtWidgets import QVBoxLayout, QPushButton, QListView, QMenu
 
-from API import Config, DraggableWindow
+from API import Config, DraggableWindow, CLInterface
 from APIService import modulateIcon
 
 from .volumeController import VolumeController
@@ -26,7 +26,13 @@ class CustomListView(QListView):
         return super().mouseMoveEvent(event)
 
 
-class VolumeControl(DraggableWindow):
+class VolumeControl(DraggableWindow, CLInterface):
+    
+    @CLInterface.register()
+    def action_set_master_volume(self, volume: str):
+        self.controller.set_system_volume(float(volume))
+        return True
+    
     def __init__(self, parent=None):
         self.showingList = False
         
