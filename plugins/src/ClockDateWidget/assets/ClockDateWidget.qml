@@ -23,7 +23,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: "#805f5f5f"
+        color: alphaBaseColor
         radius: 10
     }
 

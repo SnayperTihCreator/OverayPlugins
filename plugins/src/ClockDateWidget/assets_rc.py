@@ -1,12 +1,12 @@
 # Resource object code (Python 3)
 # Created by: object code
-# Created by: The Resource Compiler for Qt version 6.9.0
+# Created by: The Resource Compiler for Qt version 6.9.1
 # WARNING! All changes made in this file will be lost!
 
 from PySide6 import QtCore
 
 qt_resource_data = b"\
-\x00\x00\x07f\
+\x00\x00\x07i\
 i\
 mport QtQuick 2.\
 15\x0d\x0aimport QtQui\
@@ -50,83 +50,83 @@ teTime: new Date\
 gle {\x0d\x0a        a\
 nchors.fill: par\
 ent\x0d\x0a        col\
-or: \x22#805f5f5f\x22\x0d\
-\x0a        radius:\
- 10\x0d\x0a    }\x0d\x0a\x0d\x0a  \
-  GridLayout{\x0d\x0a \
-       columns: \
-2  // \xd0\xb4\xd0\xb2\xd0\xb0 \xd1\x81\xd1\
-\x82\xd0\xbe\xd0\xbb\xd0\xb1\xd1\x86\xd0\xb0\x0d\x0a   \
-     rows: 2    \
- // \xd0\xb4\xd0\xb2\xd0\xb5 \xd1\x81\xd1\x82\xd1\
-\x80\xd0\xbe\xd0\xba\xd0\xb8\x0d\x0a       \
- anchors.fill: p\
-arent\x0d\x0a        a\
-nchors.margins: \
-5\x0d\x0a\x0d\x0a        Ite\
-m{\x0d\x0a            \
-Layout.columnSpa\
-n: 2\x0d\x0a          \
-  Layout.fillHei\
-ght: true\x0d\x0a     \
-       Layout.fi\
-llWidth: true\x0d\x0a \
-           \x0d\x0a   \
-         Text {\x0d\
-\x0a               \
- id: timeLabel\x0d\x0a\
+or: alphaBaseCol\
+or\x0d\x0a        radi\
+us: 10\x0d\x0a    }\x0d\x0a\x0d\
+\x0a    GridLayout{\
+\x0d\x0a        column\
+s: 2  // \xd0\xb4\xd0\xb2\xd0\xb0 \
+\xd1\x81\xd1\x82\xd0\xbe\xd0\xbb\xd0\xb1\xd1\x86\xd0\xb0\x0d\x0a\
+        rows: 2 \
+    // \xd0\xb4\xd0\xb2\xd0\xb5 \xd1\x81\
+\xd1\x82\xd1\x80\xd0\xbe\xd0\xba\xd0\xb8\x0d\x0a    \
+    anchors.fill\
+: parent\x0d\x0a      \
+  anchors.margin\
+s: 5\x0d\x0a\x0d\x0a        \
+Item{\x0d\x0a         \
+   Layout.column\
+Span: 2\x0d\x0a       \
+     Layout.fill\
+Height: true\x0d\x0a  \
+          Layout\
+.fillWidth: true\
+\x0d\x0a            \x0d\x0a\
+            Text\
+ {\x0d\x0a            \
+    id: timeLabe\
+l\x0d\x0a             \
+   text: Qt.form\
+atDateTime(curre\
+ntDateTime, root\
+.timeFormat)\x0d\x0a  \
+              an\
+chors.centerIn: \
+parent\x0d\x0a        \
+        color: m\
+ainTextColor\x0d\x0a  \
+          }\x0d\x0a   \
+     }\x0d\x0a\x0d\x0a      \
+  Item{\x0d\x0a       \
+     Layout.fill\
+Height: true\x0d\x0a  \
+          Layout\
+.fillWidth: true\
+\x0d\x0a\x0d\x0a            \
+Text {\x0d\x0a        \
+        id: week\
+dayLabel\x0d\x0a      \
+          text: \
+weekDays[current\
+DateTime.getDay(\
+)]\x0d\x0a            \
+    anchors.cent\
+erIn: parent\x0d\x0a  \
+              co\
+lor: mainTextCol\
+or\x0d\x0a            \
+}\x0d\x0a        }\x0d\x0a\x0d\x0a\
+        Item{\x0d\x0a \
+           Layou\
+t.fillHeight: tr\
+ue\x0d\x0a            \
+Layout.fillWidth\
+: true\x0d\x0a        \
+    Text {\x0d\x0a    \
+            id: \
+dateLabel\x0d\x0a     \
+           text:\
+ Qt.formatDateTi\
+me(currentDateTi\
+me, root.dateFor\
+mat)\x0d\x0a          \
+      anchors.ce\
+nterIn: parent\x0d\x0a\
                 \
-text: Qt.formatD\
-ateTime(currentD\
-ateTime, root.ti\
-meFormat)\x0d\x0a     \
-           ancho\
-rs.centerIn: par\
-ent\x0d\x0a           \
-     color: main\
-TextColor\x0d\x0a     \
-       }\x0d\x0a      \
-  }\x0d\x0a\x0d\x0a        I\
-tem{\x0d\x0a          \
-  Layout.fillHei\
-ght: true\x0d\x0a     \
-       Layout.fi\
-llWidth: true\x0d\x0a\x0d\
-\x0a            Tex\
-t {\x0d\x0a           \
-     id: weekday\
-Label\x0d\x0a         \
-       text: wee\
-kDays[currentDat\
-eTime.getDay()]\x0d\
-\x0a               \
- anchors.centerI\
-n: parent\x0d\x0a     \
-           color\
-: mainTextColor\x0d\
-\x0a            }\x0d\x0a\
-        }\x0d\x0a\x0d\x0a   \
-     Item{\x0d\x0a    \
-        Layout.f\
-illHeight: true\x0d\
-\x0a            Lay\
-out.fillWidth: t\
-rue\x0d\x0a           \
- Text {\x0d\x0a       \
-         id: dat\
-eLabel\x0d\x0a        \
-        text: Qt\
-.formatDateTime(\
-currentDateTime,\
- root.dateFormat\
-)\x0d\x0a             \
-   anchors.cente\
-rIn: parent\x0d\x0a   \
-             col\
-or: mainTextColo\
-r\x0d\x0a            }\
-\x0d\x0a        }\x0d\x0a   \
- }\x0d\x0a}\
+color: mainTextC\
+olor\x0d\x0a          \
+  }\x0d\x0a        }\x0d\x0a\
+    }\x0d\x0a}\
 "
 
 qt_resource_name = b"\
@@ -148,7 +148,7 @@ qt_resource_struct = b"\
 \x00\x00\x00\x00\x00\x02\x00\x00\x00\x01\x00\x00\x00\x02\
 \x00\x00\x00\x00\x00\x00\x00\x00\
 \x00\x00\x00(\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\
-\x00\x00\x01\x98l\x9a\x89\x0f\
+\x00\x00\x01\x98\x8e\xf7\x90j\
 "
 
 def qInitResources():

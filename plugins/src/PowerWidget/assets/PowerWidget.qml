@@ -9,15 +9,9 @@ Item {
     property string timeLeft: ""
     property bool charging: false
 
-    Component.onCompleted: Text.defaultFont = Qt.font({
-        family: "Arial",
-        pointSize: 16,
-        weight: Font.Bold
-    })
-
     Rectangle {
         anchors.fill: parent
-        color: "#805f5f5f"
+        color: alphaBaseColor
         radius: 10
     }
 

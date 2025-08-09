@@ -38,11 +38,11 @@ class CustomPluginWindow(PluginSettingWindow):
         self.btnUpdateDevice = QPushButton("Обновить устройства")
         self.btnUpdateDevice.pressed.connect(self.updateLoaderDevice)
         self.formLayout.addRow(self.btnUpdateDevice)
-        # self.formLayout.setWidget(-1, QFormLayout.ItemRole.SpanningRole, self.btnUpdateDevice)
-        
+    
     def loader(self):
         super().loader()
-        idx = self.comboListDevice.findData({"idx": self.obj.idx_device or 0}, Qt.ItemDataRole.UserRole, Qt.MatchFlag.MatchContains)
+        idx = self.comboListDevice.findData({"idx": self.obj.idx_device or 0}, Qt.ItemDataRole.UserRole,
+                                            Qt.MatchFlag.MatchContains)
         self.comboListDevice.setCurrentIndex(idx)
     
     def updateLoaderDevice(self):
@@ -50,17 +50,17 @@ class CustomPluginWindow(PluginSettingWindow):
         self.listDevice.clear()
         for idx in range(self.p_audio.get_device_count()):
             info = self.p_audio.get_device_info_by_index(idx)
-            if info["maxInputChannels"]<=0: continue
+            if info["maxInputChannels"] <= 0: continue
             name = info["name"].encode("cp1251").decode("utf-8")
             if name in self.listDevice: continue
-            self.comboListDevice.addItem(name, {"idx":idx})
+            self.comboListDevice.addItem(name, {"idx": idx})
             self.listDevice.add(name)
-            
+    
     def send_data(self):
         data = super().send_data()
         idx = self.comboListDevice.currentIndex()
         uData = self.comboListDevice.itemData(idx, Qt.ItemDataRole.UserRole)
-        return data|{"idx_device": uData["idx"]}
+        return data | {"idx_device": uData["idx"]}
 
 
 class Virtualization(DraggableWindow):
@@ -203,14 +203,13 @@ class Virtualization(DraggableWindow):
         if isinstance(config.idx_device, Box) or config.idx_device <= 0: return
         self.idx_device = config.idx_device
         self.updateStream()
-        
+    
     def savesConfig(self):
         data = super().savesConfig()
-        return data|{
+        return data | {
             "idx_device": self.idx_device
         }
-        
-        
+    
     def updateStream(self):
         if self.stream is not None:
             self.stream.stop_stream()
@@ -224,5 +223,3 @@ class Virtualization(DraggableWindow):
             frames_per_buffer=CHUNK,
             input_device_index=self.idx_device,  # Подбери нужное устройство!
         )
-        
-        

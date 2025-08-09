@@ -20,11 +20,12 @@ def qprint(*args, **kwargs):
 class ResourceSystem(QmlDraggableWindow):
     
     def __init__(self, parent=None):
+        
+        
         super().__init__(
             Config(__file__, "draggable_window"),
             "qrc:/resource_system/ResourceSystem.qml",
             parent)
-            
         self.run_interface()
         self.idTimer = self.startTimer(1000)
         
@@ -34,11 +35,11 @@ class ResourceSystem(QmlDraggableWindow):
     
     def loadPresetData(self):
         engine = super().loadPresetData()
-        
-    
         return engine
     
     def run_interface(self):
+        if not self.isVisible(): return
+        
         self.cpu_calc()
         self.process_iter()
     
