@@ -1,14 +1,19 @@
 from typing import Any
+from abc import ABC, ABCMeta, abstractmethod
+
 from box import Box
 from PySide6.QtWidgets import QWidget
 
 
-class APIBaseWidget:
+class MetaBaseWidget(type(QWidget), ABCMeta): ...
+
+
+class APIBaseWidget(ABC, metaclass=MetaBaseWidget):
     """
     Абстрактный базовый класс для виджетов API.
     Определяет обязательный интерфейс для всех виджетов плагинов.
     """
-    
+    @abstractmethod
     def reloadConfig(self) -> None:
         """
         Абстрактный метод - должен перезагружать конфигурацию виджета.
@@ -18,6 +23,7 @@ class APIBaseWidget:
         """
         ...
     
+    @abstractmethod
     def savesConfig(self) -> dict[str, Any]:
         """
         Возвращает текущую конфигурацию виджета для сохранения.
@@ -27,6 +33,7 @@ class APIBaseWidget:
         """
         ...
     
+    @abstractmethod
     def restoreConfig(self, config: Box) -> None:
         """
         Абстрактный метод - должен восстанавливать состояние виджета из конфига.

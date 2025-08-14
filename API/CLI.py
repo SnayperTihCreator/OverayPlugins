@@ -1,9 +1,9 @@
 from typing import Callable
 
-from PySide6.QtWidgets import QWidget
+from Common.core import MetaBaseWidget
 
 
-class MetaCliInterface(type(QWidget)): ...
+class MetaCliInterface(MetaBaseWidget): ...
 
 
 class CLInterface(metaclass=MetaCliInterface):
