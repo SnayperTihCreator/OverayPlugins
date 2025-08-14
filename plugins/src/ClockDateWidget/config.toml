@@ -1,6 +1,6 @@
 [window]
-width = 220
-height = 75
+width = 250
+height = 70
 styleFile = "style.css"
 opacity = 1
 [clockFormat]
