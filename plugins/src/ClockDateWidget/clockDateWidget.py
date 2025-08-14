@@ -12,7 +12,7 @@ class ClockDateWidget(QmlDraggableWindow):
     
     def __init__(self, parent=None):
         super().__init__(
-            Config(__file__, "draggable_window"),
+            Config("ClockDateWidget", "draggable_window"),
             "qrc:/clock_date_widget/ClockDateWidget.qml",
             parent)
         

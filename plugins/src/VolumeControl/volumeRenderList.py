@@ -4,7 +4,7 @@ from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, QSize, QPoint, Q
 from PySide6.QtWidgets import QStyledItemDelegate, QSlider, QStyleOptionViewItem, QLabel
 from PySide6.QtGui import QPalette, QIcon
 
-from APIService.colorize import modulateIcon
+from ColorControl.themeController import ThemeController
 
 from .volumeController import Application, SystemVolume, BaseVolumeHandler
 
@@ -124,7 +124,8 @@ class VolumeItemDelegate(QStyledItemDelegate):
         if icon and not icon.isNull():
             
             icon_rect = QRect(QPoint(current_x, content_rect.top()), icon_size)
-            icon = modulateIcon(icon, option.palette.color(QPalette.ColorRole.ButtonText))
+            
+            icon = ThemeController().modulated(icon)
             icon.paint(painter, icon_rect)
             current_x += icon_size.width() + self.spacing
         

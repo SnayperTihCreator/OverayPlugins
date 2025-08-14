@@ -65,7 +65,7 @@ class CustomPluginWindow(PluginSettingWindow):
 
 class Virtualization(DraggableWindow):
     def __init__(self, parent=None):
-        super().__init__(Config(__file__, "draggable_window"), parent)
+        super().__init__(Config("VirtualizationWidget", "draggable_window"), parent)
         
         self.idx_device = None
         self.stream = None

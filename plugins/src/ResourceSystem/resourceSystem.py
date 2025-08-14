@@ -23,7 +23,7 @@ class ResourceSystem(QmlDraggableWindow):
         
         
         super().__init__(
-            Config(__file__, "draggable_window"),
+            Config("ResourceSystem", "draggable_window"),
             "qrc:/resource_system/ResourceSystem.qml",
             parent)
         self.run_interface()
@@ -35,6 +35,7 @@ class ResourceSystem(QmlDraggableWindow):
     
     def loadPresetData(self):
         engine = super().loadPresetData()
+        self.run_interface()
         return engine
     
     def run_interface(self):

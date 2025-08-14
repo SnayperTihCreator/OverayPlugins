@@ -2,7 +2,7 @@ from typing import Callable
 
 from .core import BaseVolumeHandler, Application, SystemVolume
 
-from APIService.platformCurrent import getSystem
+from PathControl.platformCurrent import getSystem
 
 platform, _ = getSystem()
 if platform == "win32":

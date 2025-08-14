@@ -15,7 +15,7 @@ class ManagerTask(OverlayWidget, Ui_ManagerTask):
     task_status_changed = Signal(int, TaskStatus)  # Сигнал изменения статуса задачи
     
     def __init__(self, parent):
-        super().__init__(Config(__file__, "overlay_widget"), parent)
+        super().__init__(Config("ManagerTask", "overlay_widget"), parent)
         self.setupUi(self)
         parent.addWidget(
             self,

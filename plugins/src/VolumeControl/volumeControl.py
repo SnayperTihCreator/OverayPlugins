@@ -1,9 +1,8 @@
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon, QColor
 from PySide6.QtWidgets import QVBoxLayout, QPushButton, QListView, QMenu
 
 from API import Config, DraggableWindow, CLInterface
-from APIService import modulateIcon
+from ColorControl.themeController import ThemeController
 
 from .volumeController import VolumeController
 from .volumeRenderList import VolumeListModel, VolumeItemDelegate
@@ -26,6 +25,7 @@ class CustomListView(QListView):
         return super().mouseMoveEvent(event)
 
 
+
 class VolumeControl(DraggableWindow, CLInterface):
     
     @CLInterface.register()
@@ -36,14 +36,15 @@ class VolumeControl(DraggableWindow, CLInterface):
     def __init__(self, parent=None):
         self.showingList = False
         
-        super().__init__(Config(__file__, "draggable_window"), parent)
+        super().__init__(Config("VolumeControl", "draggable_window"), parent)
         
         self.controller = VolumeController()
         
         self.box = QVBoxLayout(self.central_widget)
         self.box.setSpacing(1)
         
-        header = QPushButton(modulateIcon(QIcon(":/volume_control/header.png"), QColor(self.config.theme.color)), "Volume Control")
+        iconHeader = ThemeController().getImage(":/volume_control/header.png", "icon", True)
+        header = QPushButton(iconHeader, "Volume Control")
         header.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header.setIconSize(QSize(20, 20))
         

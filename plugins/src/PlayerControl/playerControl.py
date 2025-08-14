@@ -3,7 +3,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QColor
 
 from API import Config, DraggableWindow
-from APIService.colorize import modulateIcon
+from ColorControl.colorize import modulateIcon
 
 from .utils import fakeInput, PlayerCode
 from . import icons_rc
@@ -11,7 +11,7 @@ from . import icons_rc
 
 class PlayerControl(DraggableWindow):
     def __init__(self, parent=None):
-        super().__init__(Config(__file__, "draggable_window"), parent)
+        super().__init__(Config("PlayerControl", "draggable_window"), parent)
         self.runs = True
         self.icons = None
         
