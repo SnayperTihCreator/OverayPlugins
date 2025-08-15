@@ -1,5 +1,5 @@
 [plugin]
-path="plugins\\src\\ResourceSystem"
+path="plugins/src/ResourceSystem"
 [build]
 exclude = []
 [platform]

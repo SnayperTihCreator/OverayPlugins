@@ -1,5 +1,6 @@
 [plugin]
-path="plugins\\src\\VolumeControl"
+path="plugins/src/VolumeControl"
 [build]
 exclude = ["/icons", "*.qrc"]
 [platform]
+available = ["win32"]

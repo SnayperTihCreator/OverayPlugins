@@ -1,5 +1,5 @@
 [plugin]
-path="plugins\\src\\PowerWidget"
+path="plugins/src/PowerWidget"
 [build]
 exclude = ["/assets", "*.qrc"]
 [platform]

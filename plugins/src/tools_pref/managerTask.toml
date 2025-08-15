@@ -1,5 +1,5 @@
 [plugin]
-path="plugins\\src\\ManagerTask"
+path="plugins/src/ManagerTask"
 [build]
 exclude = ["*.ui", "*.yml"]
 [platform]

@@ -1,6 +1,5 @@
 [plugin]
-path="plugins\\src\\VirtualizationWidget"
+path="plugins/src/VirtualizationWidget"
 [build]
 exclude = []
 [platform]
-available = ["win32"]
