@@ -13,16 +13,15 @@ class Config:
     
     def __init__(
             self,
-            path: str | Path,
-            plugin_type: Literal["draggable_window", "overlay_widget"],
+            name: str,
+            plugin_type: Literal["draggable_window", "overlay_widget", "apps", "theme"],
             config_name: str = "config",
-            create_is_not: bool = True
     ) -> None:
         """
         Инициализирует конфигурацию плагина.
 
         Args:
-            path: Путь, относительно которого ищется конфиг (в родительской директории)
+            name: имя ресурса
             plugin_type: Тип плагина (определяет набор дефолтных значений)
             config_name: Имя конфигурационного файла (без расширения)
             create_is_not: Создавать ли новый конфиг, если файл не найден

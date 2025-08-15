@@ -1,0 +1,7 @@
+
+[theme]
+name = "Mocha"
+[colors]
+base = "#6c7086" # Базовый фон
+main_text = "#cdd6f4" # Основной текст
+alt_text = "#89b4fa" # Второй текст

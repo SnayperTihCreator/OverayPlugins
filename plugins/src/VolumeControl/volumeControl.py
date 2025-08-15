@@ -43,8 +43,9 @@ class VolumeControl(DraggableWindow, CLInterface):
         self.box = QVBoxLayout(self.central_widget)
         self.box.setSpacing(1)
         
-        iconHeader = ThemeController().getImage(":/volume_control/header.png", "icon", True)
-        header = QPushButton(iconHeader, "Volume Control")
+        header = QPushButton("Volume Control")
+        ThemeController().registerWidget(header, ":/volume_control/header.png", "setIcon", "icon", True)
+        ThemeController().updateWidget(header)
         header.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         header.setIconSize(QSize(20, 20))
         

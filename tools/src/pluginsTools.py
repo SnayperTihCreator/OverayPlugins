@@ -58,7 +58,7 @@ def createTools(
 def createBuildFile(
         name: str = typer.Argument(..., help="Имя плагина"),
         path: Path = typer.Argument(..., help="Путь куда сохранить"),
-        pathplugin: Path = typer.Argument(..., help="Путь к плагину"),
+        path_plugin: Path = typer.Argument(..., help="Путь к плагину"),
         exclude: str = typer.Argument(None, help="Все что исключить(больше одного через ';')"),
         platforms: str = typer.Argument(None, help="Платформы(через ';')")
 ):
@@ -69,7 +69,19 @@ def createBuildFile(
         platforms = platforms or ""
         platforms = platforms.split(";")
         
-        tools.createBuildFile(name, pathplugin, path, platforms, exclude)
+        tools.createBuildFile(name, path_plugin, path, platforms, exclude)
+        typer.secho(f"Создан в {path}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
+@creator.command(name="theme", help="Создать папку темы")
+def createThemeFolder(
+        name: str = typer.Argument(..., help="Имя темы"),
+        path: Path = typer.Argument(..., help="Путь куда сохранить")
+):
+    try:
+        tools.createFolderTheme(name, path)
         typer.secho(f"Создан в {path}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
@@ -97,13 +109,25 @@ def buildPlugin(
 def buildPack(
         build_file: Path = typer.Argument(..., help="Путь к файлу сборки", ),
         path_output: Path = typer.Argument(..., help="Выходная папка"),
-        path_plugin: Path = typer.Argument(Path("./compress"), help="Путь к собранному плагину"),
+        path_plugin: Path = typer.Argument(Path("../../themes/compress"), help="Путь к собранному плагину"),
 ):
     dataToml = utils.parseBuildFile(build_file)
     try:
         plugin = utils.buildPlugin(dataToml, path_plugin)
         pack = utils.buildPack(dataToml, plugin, path_output)
         typer.secho(f"Пакет успешно собран {pack}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
+@builder.command(name="theme", help="Собрать тему")
+def buildTheme(
+        folder_input: Path = typer.Argument(..., help="Путь к папке темы"),
+        path_output: Path = typer.Argument(..., help="Выходная папка")
+):
+    try:
+        theme = utils.buildTheme(folder_input, path_output)
+        typer.secho(f"Тема успешно собрана {theme}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 

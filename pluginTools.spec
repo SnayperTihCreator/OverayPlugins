@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['pluginsTools.py'],
+    ['tools/src/pluginsTools.py'],
     pathex=[],
     binaries=[],
     datas=[],
