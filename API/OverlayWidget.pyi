@@ -1,53 +1,65 @@
 from PySide6.QtWidgets import QWidget
+from typing import Optional, Any
+
 from API.config import Config
-from API.core import APIBaseWidget
+from Common.core import APIBaseWidget
 from API.PluginSetting import PluginSettingWidget
+from ApiPlugins.widgetPreloader import WidgetPreLoader
 
 
 class OverlayWidget(QWidget, APIBaseWidget):
     """
-    Базовый класс для оверлейных виджетов (накладываемых поверх других окон).
+    Базовый виджет-оверлей с поддержкой тем и конфигурации.
 
-    Предоставляет базовый функционал для:
-    - Работы с конфигурацией
-    - Создания виджета настроек
-    - Сериализации/десериализации состояния
     """
     
-    def __init__(self, config: Config, parent: QWidget = None) -> None:
+    dumper: WidgetPreLoader
+    
+    def __init__(self, config: Config, parent: Optional[QWidget] = None) -> None:
         """
         Инициализирует оверлейный виджет.
 
-        Args:
-            config: Конфигурация виджета
-            parent: Родительский виджет
+        :param Config config: Конфигурация виджета
+        :param Optional[QWidget] parent: Родительский виджет
         """
         ...
     
     def reloadConfig(self) -> None:
-        """Перезагружает конфигурацию и обновляет состояние виджета."""
-        ...
-    
-    def savesConfig(self) -> dict:
         """
-        Возвращает текущее состояние виджета для сохранения.
-
-        Returns:
-            dict: Пустой словарь (должен быть переопределен в дочерних классах)
+        Перезагружает конфигурацию виджета.
         """
         ...
     
-    def restoreConfig(self, config: dict) -> None:
+    def savesConfig(self) -> dict[str, Any]:
         """
-        Восстанавливает состояние виджета из конфигурации.
+        Возвращает текущее состояние для сохранения.
 
-        Args:
-            config: Словарь с настройками
+        :return dict[str, Any]: Словарь с сохраняемыми параметрами.
+        :note: В базовой реализации возвращает пустой словарь
+        """
+        ...
+    
+    def restoreConfig(self, config: dict[str, Any]) -> None:
+        """
+        Восстанавливает состояние из конфигурации.
+
+        :param dict[str, Any] config: Ранее сохранённые параметры.
+        :note: В базовой реализации не делает ничего
         """
         ...
     
     def loader(self) -> None:
-        """Загружает/обновляет состояние виджета (должен быть реализован в потомках)."""
+        """
+        Основной метод загрузки содержимого виджета.
+
+        :note: Предназначен для переопределения в дочерних классах
+        """
+        ...
+    
+    def loadConfig(self) -> None:
+        """
+        Загружает конфигурацию стилей и тем.
+        """
         ...
     
     @classmethod
@@ -58,14 +70,11 @@ class OverlayWidget(QWidget, APIBaseWidget):
             parent: QWidget
     ) -> PluginSettingWidget:
         """
-        Создает виджет настроек для данного оверлейного виджета.
+        Создаёт виджет настроек для этого виджета-оверлея.
 
-        Args:
-            widget: Экземпляр OverlayWidget
-            name_plugin: Имя плагина
-            parent: Родительский виджет
-
-        Returns:
-            PluginSettingWidget: Виджет с настройками
+        :param OverlayWidget widget: Экземпляр виджета
+        :param str name_plugin: Имя плагина
+        :param QWidget parent: Родительский виджет.
+        :return PluginSettingWidget: Виджет настроек
         """
         ...

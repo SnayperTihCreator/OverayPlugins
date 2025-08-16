@@ -1,9 +1,13 @@
 QPushButton {
-    background-color: transparent;
+    color: none;
     border: none;
+    background-color: none;
 }
 
-QLabel {
-    font: 15px bold !important;
-    background-color: transparent;
+QPushButton:hover {
+    background-color: #{{ theme.hovered() }};
+}
+
+QPushButton:pressed {
+    background-color: #{{ theme.pressed() }};
 }

@@ -1,70 +1,65 @@
+from abc import ABC, abstractmethod
 from typing import Any
-from abc import ABC, ABCMeta, abstractmethod
 
 from box import Box
 from PySide6.QtWidgets import QWidget
 
 
-class MetaBaseWidget(type(QWidget), ABCMeta): ...
+class MetaBaseWidget(type(QWidget)):
+    """Метакласс для базового виджета API."""
+    ...
 
 
-class APIBaseWidget(ABC, metaclass=MetaBaseWidget):
+class APIBaseWidget(QWidget, ABC, metaclass=MetaBaseWidget):
     """
-    Абстрактный базовый класс для виджетов API.
-    Определяет обязательный интерфейс для всех виджетов плагинов.
+    Абстрактный базовый класс для всех виджетов API.
+
+    Обеспечивает:
+    - Единый интерфейс работы с конфигурацией
+    - Поддержку системы настроек
+    - Типизированное взаимодействие между компонентами
     """
+    
+    dumper: Any  #: Класс для дампа/загрузки состояния
+    config: Box  #: Конфигурация виджета
+    
     @abstractmethod
     def reloadConfig(self) -> None:
-        """
-        Абстрактный метод - должен перезагружать конфигурацию виджета.
-
-        Raises:
-            NotImplementedError: Если не реализован в дочернем классе
-        """
+        """Перезагружает конфигурацию виджета."""
         ...
     
     @abstractmethod
-    def savesConfig(self) -> dict[str, Any]:
+    def savesConfig(self) -> Box:
         """
-        Возвращает текущую конфигурацию виджета для сохранения.
+        Возвращает текущее состояние для сохранения.
 
-        Returns:
-            Dict[str, Any]: Словарь с настройками виджета
+        :return: Конфигурация в формате Box
         """
         ...
     
     @abstractmethod
     def restoreConfig(self, config: Box) -> None:
         """
-        Абстрактный метод - должен восстанавливать состояние виджета из конфига.
+        Восстанавливает состояние из конфигурации.
 
-        Args:
-            config: Конфигурация виджета в формате Box
-
-        Raises:
-            NotImplementedError: Если не реализован в дочернем классе
+        :param config: Ранее сохраненная конфигурация
         """
         ...
     
     @classmethod
+    @abstractmethod
     def createSettingWidget(
             cls,
-            obj: "APIBaseWidget",
+            obj: 'APIBaseWidget',
             name_plugin: str,
-            parent: QWidget
-    ) -> QWidget:
+            parent: Any
+    ) -> Any:
         """
-        Абстрактный метод - должен создавать виджет настроек для этого виджета.
+        Создает виджет настроек для этого компонента.
 
-        Args:
-            obj: Экземпляр виджета
-            name_plugin: Имя плагина
-            parent: Родительский виджет
-
-        Returns:
-            QWidget: Виджет с настройками
-
-        Raises:
-            NotImplementedError: Если не реализован в дочернем классе
+        :param obj: Экземпляр виджета
+        :param name_plugin: Имя плагина
+        :param parent: Родительский виджет
+        :return: Виджет настроек
         """
         ...

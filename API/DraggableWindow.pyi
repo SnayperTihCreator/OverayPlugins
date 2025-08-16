@@ -6,7 +6,7 @@ from PySide6.QtQuickWidgets import QQuickWidget
 from PySide6.QtQml import QQmlEngine
 
 from API.config import Config
-from API.core import APIBaseWidget
+from Common.core import APIBaseWidget
 from API.PluginSetting import PluginSettingWindow
 
 
@@ -29,9 +29,8 @@ class DraggableWindow(QMainWindow, APIBaseWidget):
         """
         Инициализирует перетаскиваемое окно.
 
-        Args:
-            config: Конфигурация окна (размеры, стили и пр.)
-            parent: Родительский виджет
+        :param Config config: Конфигурация окна (размеры, стили и пр.)
+        :param Optional[QWidget] parent: Родительский виджет
         """
         ...
     
@@ -48,15 +47,19 @@ class DraggableWindow(QMainWindow, APIBaseWidget):
         ...
     
     def shortcut_run(self, name: str) -> None:
-        """Обработчик вызова по горячей клавише."""
+        """
+        Обработчик вызова по горячей функции.
+
+        :param str name: Имя действия
+        """
         ...
     
     def toggle_input(self, state: bool) -> None:
         """
         Переключает режим прозрачности для ввода.
 
-        Args:
-            state: Если True, окно становится прозрачным для ввода
+        :param bool state: Если True, окно становится прозрачным для ввода.
+        :note: Не влияет на визуальную прозрачность, только на обработку событий
         """
         ...
     
@@ -64,14 +67,16 @@ class DraggableWindow(QMainWindow, APIBaseWidget):
         """
         Восстанавливает состояние окна из конфига.
 
-        Args:
-            config: Конфиг с параметрами позиции, прозрачности и др.
+        :param Any config: Конфиг с параметрами позиции, прозрачности и др.
         """
         ...
     
     def highlightBorder(self) -> None:
-        """Анимирует подсветку границ окна (визуальный фокус)."""
-        ...
+        """
+        Анимирует подсветку границ окна (визуальный фокус).
+
+        :note: Использует анимацию длительностью 300 мс
+        """
     
     @classmethod
     def createSettingWidget(
@@ -83,28 +88,74 @@ class DraggableWindow(QMainWindow, APIBaseWidget):
         """
         Создает виджет настроек для этого окна.
 
-        Args:
-            window: Экземпляр DraggableWindow
-            name_plugin: Имя плагина
-            parent: Родительский виджет
-
-        Returns:
-            PluginSettingWindow: Виджет с настройками
+        :param DraggableWindow window: Экземпляр DraggableWindow
+        :param str name_plugin: Имя плагина
+        :param QWidget parent: Родительский виджет
+        :return PluginSettingWindow: Виджет с настройками
         """
-        ...
+    
+    def savesConfig(self) -> dict[str, Any]:
+        """
+        Возвращает словарь для сохранения параметров в глобальное сохранение
+
+        :return: Словарь с конфигурационными параметрами
+        :rtype: dict[str, Any]
+        :note: Содержит позицию, прозрачность ввода и перетаскивания
+        """
     
     
 class QmlDraggableWindow(DraggableWindow):
+    """
+    Перетаскиваемое окно с QML-сценой.
+
+    Наследует функциональность DraggableWindow и добавляет QML-интеграцию.
+    """
+    
     central_widget: QQuickWidget
     
-    def __init__(self, config, url, parent=None): ...
+    def __init__(self, config: Config, url: str, parent: Optional[QWidget] = None):
+        """
+        Инициализирует QML-окно.
+
+        :param Config config: Конфигурация окна
+        :param str url: Путь к QML-файлу интерфейса
+        :param Optional[QWidget] parent: Родительский виджет
+        """
     
-    def loadQmlContent(self, url: str): ...
+    def loadQmlContent(self, url: str):
+        """
+        Загружает QML-файл.
+
+        :param str url: Путь к QML-файлу
+        :raises QMLException: Если загрузка не удалась
+        """
     
-    def getRootQml(self) -> QQuickItem: ...
+    def getRootQml(self) -> QQuickItem:
+        """
+        Возвращает корневой элемент загруженной QML-сцены.
+
+        :return QQuickItem: Корневой QML-элемент
+        """
     
-    def setRootProperty(self, name:str, value: Any): ...
+    def setRootProperty(self, name:str, value: Any):
+        """
+        Устанавливает свойство корневого QML-объекта.
+        
+        :param str name: Имя свойства для установки
+        :param Any value: Значение свойства
+        """
     
-    def setContextProperty(self, name: str, value: Any): ...
+    def setContextProperty(self, name: str, value: Any):
+        """
+        Регистрирует глобальную переменную в QML-контексте.
+
+        :param str name: Имя переменной для доступа из QML.
+        :param Any value: Значение переменной.
+        """
     
-    def loadPresetData(self)->QQmlEngine: ...
+    def loadPresetData(self)->QQmlEngine:
+        """
+        Загружает предустановленные данные в QML-движок и возвращает экземпляр движка.
+        
+        :return QQmlEngine: Экземпляр QML-движка после загрузки данных.
+        """
