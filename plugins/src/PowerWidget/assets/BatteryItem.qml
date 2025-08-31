@@ -52,18 +52,11 @@ Item {
         radius: 2
     }
 
-    Text {
-        anchors.centerIn: batteryBody
-        text: root.level + "%"
-        color: "white"
-        visible: root.level >= 10
-    }
-
     Image {
         anchors.centerIn: batteryBody
         source: "qrc:/power_widget/icons/lightning.png"
-        width: parent.width * 0.6
-        height: parent.height * 0.6
+        width: parent.width * 0.4
+        height: parent.height * 0.4
         visible: root.charging
     }
 }

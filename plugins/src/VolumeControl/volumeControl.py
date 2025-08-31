@@ -1,11 +1,12 @@
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import QVBoxLayout, QPushButton, QListView, QMenu
 
-from API import Config, DraggableWindow, CLInterface
+from API import Config, OWindow, CLInterface, WindowConfigData
 from ColorControl.themeController import ThemeController
 
 from .volumeController import VolumeController
 from .volumeRenderList import VolumeListModel, VolumeItemDelegate
+# noinspection PyUnresolvedReferences
 from . import icons_rc
 
 
@@ -23,10 +24,14 @@ class CustomListView(QListView):
             self.parent().mouseMoveEvent(event)
             return
         return super().mouseMoveEvent(event)
+    
+
+class VolumeDataConfig(WindowConfigData):
+    openList: int
 
 
-
-class VolumeControl(DraggableWindow, CLInterface):
+class VolumeControl(OWindow, CLInterface):
+    _config_data_ = VolumeDataConfig
     
     @CLInterface.register()
     def action_set_master_volume(self, volume: str):
@@ -36,7 +41,7 @@ class VolumeControl(DraggableWindow, CLInterface):
     def __init__(self, parent=None):
         self.showingList = False
         
-        super().__init__(Config("VolumeControl", "draggable_window"), parent)
+        super().__init__(Config("VolumeControl", "window"), parent)
         
         self.controller = VolumeController()
         
@@ -78,7 +83,7 @@ class VolumeControl(DraggableWindow, CLInterface):
         self.box.addWidget(self.btnUpdate)
         
         self.idTimer = self.startTimer(5000)
-        
+    
     def timerEvent(self, event, /):
         if event.id().value == self.idTimer:
             self.modelVolumeList.refresh()
@@ -117,7 +122,7 @@ class VolumeControl(DraggableWindow, CLInterface):
     def loadConfig(self):
         super().loadConfig()
         if self.showingList:
-            width, height = self.config.window.width, self.config.window.height
+            width, height = self.config.data.window.width, self.config.data.window.height
             self.setFixedSize(width * 2.5, height * 4)
     
     def hideEvent(self, event, /):
@@ -132,16 +137,15 @@ class VolumeControl(DraggableWindow, CLInterface):
         self.controller.start_monitoring(self._on_change)
         return super().showEvent(event)
     
-    def savesConfig(self):
-        data = super().savesConfig()
+    def __save_config__(self) -> dict:
+        data = super().__save_config__()
         data |= {"openList": int(self.showingList)}
         return data
     
-    def restoreConfig(self, config):
-        super().restoreConfig(config)
-        self.showingList = bool(int(config.openList))
-        
-        if self.showingList:
+    def __restore_config__(self, config: VolumeDataConfig):
+        super().__restore_config__(config)
+        if config.openList:
             self.act_open_volume_list()
         else:
             self.act_close_volume_list()
+            

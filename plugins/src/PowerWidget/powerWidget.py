@@ -2,13 +2,15 @@ from PySide6.QtCore import QTimer
 import psutil
 
 from API import Config, QmlDraggableWindow
+from .config import PowerWidgetConfig
+# noinspection PyUnresolvedReferences
 from . import assets_rc
 
 
 class PowerWidget(QmlDraggableWindow):
     def __init__(self, parent=None):
         super().__init__(
-            Config("PowerWidget", "draggable_window"),
+            Config("PowerWidget", "window", scheme=PowerWidgetConfig),
             "qrc:/power_widget/PowerWidget.qml",
             parent)
         

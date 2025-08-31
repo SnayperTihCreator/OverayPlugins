@@ -2,22 +2,23 @@ from PySide6.QtWidgets import QVBoxLayout, QPushButton
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QColor
 
-from API import Config, DraggableWindow
+from API import Config, OWindow
 from ColorControl.colorize import modulateIcon
 
 from .utils import fakeInput, PlayerCode
+from .config import PlayerControlConfig
+# noinspection PyUnresolvedReferences
 from . import icons_rc
 
 
-class PlayerControl(DraggableWindow):
+class PlayerControl(OWindow):
     def __init__(self, parent=None):
-        super().__init__(Config("PlayerControl", "draggable_window"), parent)
+        super().__init__(Config("PlayerControl", "window", scheme=PlayerControlConfig), parent)
         self.runs = True
         self.icons = None
         
-        parent.registered_shortcut("play/pause media", "toggle_play", self)
-        
-        sizeIcon = QSize(1, 1) * self.config.icons.size
+        self.shortcut("play/pause media", "toggle_play")
+        sizeIcon = QSize(1, 1) * self.config.data.icons.size
         
         self.box = QVBoxLayout()
         self.central_widget.setLayout(self.box)
@@ -76,13 +77,13 @@ class PlayerControl(DraggableWindow):
         self.set_state_play_pause(self.playing)
         
     def updateIcons(self):
-        self.btn_play_pause.setIcon(self.getIcon("play", self.config.icons.modulate))
-        self.btn_next_track.setIcon(self.getIcon("track_next", self.config.icons.modulate))
-        self.btn_prev_track.setIcon(self.getIcon("track_prev", self.config.icons.modulate))
-        self.btn_vol_up.setIcon(self.getIcon("volume_up", self.config.icons.modulate))
-        self.btn_vol_down.setIcon(self.getIcon("volume_down", self.config.icons.modulate))
-        self.btn_vol_mute.setIcon(self.getIcon("volume_mute", self.config.icons.modulate))
-        self.header.setIcon(self.getIcon("header", self.config.icons.modulate))
+        self.btn_play_pause.setIcon(self.getIcon("play", self.config.data.icons.modulate))
+        self.btn_next_track.setIcon(self.getIcon("track_next", self.config.data.icons.modulate))
+        self.btn_prev_track.setIcon(self.getIcon("track_prev", self.config.data.icons.modulate))
+        self.btn_vol_up.setIcon(self.getIcon("volume_up", self.config.data.icons.modulate))
+        self.btn_vol_down.setIcon(self.getIcon("volume_down", self.config.data.icons.modulate))
+        self.btn_vol_mute.setIcon(self.getIcon("volume_mute", self.config.data.icons.modulate))
+        self.header.setIcon(self.getIcon("header", self.config.data.icons.modulate))
     
     def shortcut_run(self, name):
         match name:
@@ -93,7 +94,7 @@ class PlayerControl(DraggableWindow):
             self.runs = False
     
     def set_state_play_pause(self, state):
-        icon = self.getIcon("play" if not state else "pause", self.config.icons.modulate)
+        icon = self.getIcon("play" if not state else "pause", self.config.data.icons.modulate)
         self.btn_play_pause.setIcon(icon)
         
     def send_media_key(self, keycode):

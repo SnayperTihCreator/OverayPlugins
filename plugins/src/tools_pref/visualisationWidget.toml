@@ -1,0 +1,5 @@
+[plugin]
+path="plugins/src/VisualisationWidget"
+[build]
+exclude = []
+[platform]

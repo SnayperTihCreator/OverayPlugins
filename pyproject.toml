@@ -1,0 +1,18 @@
+[project]
+name = "overayplugins"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "attrs>=25.3.0",
+    "json5>=0.12.1",
+    "pycaw>=20240210",
+    "pydantic>=2.11.7",
+    "pyinstaller>=6.15.0",
+    "pyside6==6.9.0",
+    "python-box>=7.3.2",
+    "pyyaml>=6.0.2",
+    "toml>=0.10.2",
+    "typer>=0.16.1",
+]

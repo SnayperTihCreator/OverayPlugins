@@ -1,27 +1,27 @@
 from PySide6.QtWidgets import QTableWidgetItem, QMenu
 from PySide6.QtCore import Qt, Signal, Slot, QThreadPool, QTimer, QDeadlineTimer
 
-from API import Config, OverlayWidget, saveResource, loadResource
+from API import Config, OWidget, saveResource, loadResource
 
 from .uis.main_ui import Ui_ManagerTask
 from .dialogCreateTask import CreateDialogTask
 from .tasks import Task, TaskStatus
 from .dialogAction import DialogAction
+from .config import ManagerTaskConfig
 
 
-class ManagerTask(OverlayWidget, Ui_ManagerTask):
+class ManagerTask(OWidget, Ui_ManagerTask):
     """Главный менеджер задач с Qt-интеграцией"""
     
     task_status_changed = Signal(int, TaskStatus)  # Сигнал изменения статуса задачи
     
     def __init__(self, parent):
-        super().__init__(Config("ManagerTask", "overlay_widget"), parent)
+        super().__init__(Config("ManagerTask", "widget", scheme=ManagerTaskConfig), parent)
         self.setupUi(self)
-        parent.addWidget(
-            self,
-            [Qt.AnchorPoint.AnchorHorizontalCenter, Qt.AnchorPoint.AnchorBottom]
+        self.gridOverlay(
+            Qt.AnchorPoint.AnchorHorizontalCenter,
+            Qt.AnchorPoint.AnchorBottom
         )
-        
         QThreadPool.globalInstance().setMaxThreadCount(4)
         
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
@@ -138,32 +138,23 @@ class ManagerTask(OverlayWidget, Ui_ManagerTask):
         """Загрузка сохраненных задач"""
         try:
             tasks = loadResource(
-                self.config.tasks.path,
+                self.config.data.tasks.path,
                 self.config
             )
             for task in tasks:
                 self.add_task(task)
-        except FileNotFoundError:
-            pass
+        except FileNotFoundError as e:
+            print(type(e), e)
         super().loader()
-    
-    def savesConfig(self):
-        """Сохранение текущих задач"""
+        
+    def __save_config__(self) -> dict:
         try:
             saveResource(
-                self.config.tasks.path,
+                self.config.data.tasks.path,
                 self.config,
                 self._tasks
             )
         except Exception as e:
             import traceback
             print(*traceback.format_exception(e))
-        return super().savesConfig()
-    
-    def reloadConfig(self):
-        """Перезагрузка конфигурации"""
-        super().reloadConfig()
-    
-    def restoreConfig(self, config):
-        """Восстановление конфигурации"""
-        super().restoreConfig(config)
+        return super().__save_config__()
