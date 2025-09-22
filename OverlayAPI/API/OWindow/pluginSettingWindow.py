@@ -1,7 +1,8 @@
 from PySide6.QtWidgets import QFormLayout, QCheckBox, QWidget
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QEvent
 
 from API.PlugSetting import PluginSettingTemplate, SettingConfigData
+from ColorControl.themeController import ThemeController
 
 
 class WindowConfigData(SettingConfigData):
@@ -38,5 +39,5 @@ class PluginSettingWindow(PluginSettingTemplate):
         
         return data | {
             "hasMoved": self.moved.checkState() == Qt.CheckState.Checked,
-            "noClicked": self.no_clicked.checkState() == Qt.CheckState.Checked
+            "notClicked": self.no_clicked.checkState() == Qt.CheckState.Checked
         }

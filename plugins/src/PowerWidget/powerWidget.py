@@ -16,14 +16,9 @@ class PowerWidget(QmlDraggableWindow):
         
         self._last_percent = 0
         self._last_left_time = ""
-        
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.updateData)
-        self.timer.start(1000)
-        self.updateData()
     
-    def updateData(self):
-        super().updateData()
+    def __process__(self):
+        super().__process__()
         battery = psutil.sensors_battery()
         if battery is None:
             return

@@ -82,11 +82,10 @@ class VolumeControl(OWindow, CLInterface):
         self.box.addWidget(self.btnOpenList)
         self.box.addWidget(self.btnUpdate)
         
-        self.idTimer = self.startTimer(5000)
-    
-    def timerEvent(self, event, /):
-        if event.id().value == self.idTimer:
-            self.modelVolumeList.refresh()
+        self.time_msec = 5000
+        
+    def __process__(self):
+        self.modelVolumeList.refresh()
     
     def act_open_volume_list(self):
         self.showingList = True

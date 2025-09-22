@@ -19,11 +19,8 @@ class ClockDateWidget(QmlDraggableWindow):
         self.setRootProperty("timeFormat", self.config.data.clockFormat.timeFormat)
         self.setRootProperty("dateFormat", self.config.data.clockFormat.dateFormat)
         
-        self.idTimer = self.startTimer(1000)
-    
-    def timerEvent(self, event, /):
-        if event.id().value == self.idTimer:
-            self.setRootProperty("currentDateTime", QDateTime.currentDateTime())
+    def __process__(self):
+        self.setRootProperty("currentDateTime", QDateTime.currentDateTime())
     
     def loadPresetData(self):
         engine = super().loadPresetData()

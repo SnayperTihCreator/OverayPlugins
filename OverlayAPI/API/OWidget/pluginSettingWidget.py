@@ -11,3 +11,6 @@ class PluginSettingWidget(PluginSettingTemplate):
     
     def __init__(self, obj, name_plugin, parent=None):
         super().__init__(obj, name_plugin, parent)
+        
+    def send_data(self):
+        return {"position": self.obj.pos()}

@@ -35,9 +35,6 @@ class ManagerTask(OWidget, Ui_ManagerTask):
         # Сигналы
         self.btnCreateTask.pressed.connect(self._create_task)
         self.task_status_changed.connect(self._update_task_status)
-        
-        # Таймер обновления задач
-        self._setup_task_timer()
     
     @Slot(int, TaskStatus)
     def _update_task_status(self, row: int, status: TaskStatus):
@@ -46,7 +43,7 @@ class ManagerTask(OWidget, Ui_ManagerTask):
             item = QTableWidgetItem(status.name)
             self.tableWidget.setItem(row, 2, item)
     
-    def handler_tasks(self):
+    def __process__(self):
         if not self._tasks: return
         sorted_tasks = sorted(self._tasks, key=lambda t: t.priority, reverse=True)
         
@@ -57,12 +54,6 @@ class ManagerTask(OWidget, Ui_ManagerTask):
                 break
             
             task.update()
-    
-    def _setup_task_timer(self):
-        """Настройка таймера для обработки задач"""
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.handler_tasks)
-        self.timer.start(1000)  # Обновление каждую секунду
     
     def get_task(self, row: int) -> Task:
         """Получение задачи по строке таблицы"""
@@ -134,7 +125,7 @@ class ManagerTask(OWidget, Ui_ManagerTask):
             dialog = DialogAction(task.actions, self)
             dialog.show()
     
-    def loader(self):
+    def __ready__(self):
         """Загрузка сохраненных задач"""
         try:
             tasks = loadResource(
@@ -145,7 +136,7 @@ class ManagerTask(OWidget, Ui_ManagerTask):
                 self.add_task(task)
         except FileNotFoundError as e:
             print(type(e), e)
-        super().loader()
+        super().__ready__()
         
     def __save_config__(self) -> dict:
         try:

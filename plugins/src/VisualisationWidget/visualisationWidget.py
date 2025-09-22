@@ -76,6 +76,7 @@ class Visualisation(OWindow):
         
         self.idx_device = None
         self.stream = None
+        self.time_msec = 30
         
         # Инициализация PyAudio
         self.p = pyaudio.PyAudio()
@@ -130,16 +131,8 @@ class Visualisation(OWindow):
         container = QWidget()
         container.setLayout(layout)
         self.setCentralWidget(container)
-        
-        self.updateData()
-        
-        # Таймер для обновления графика
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.updateData)
-        self.timer.start(30)  # Обновление ~30 FPS
     
-    def updateData(self):
-        if not self.isVisible(): return
+    def __process__(self):
         # Чтение аудиоданных
         if self.stream is None: return
         
@@ -191,7 +184,7 @@ class Visualisation(OWindow):
         self.fft_curve2.setData(
             freqs, -smoothed_fft, fillLevel=0, brush=QBrush(gradient)
         )
-        super().updateData()
+        super().__process__()
     
     def closeEvent(self, event):
         # Очистка ресурсов
