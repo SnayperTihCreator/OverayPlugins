@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ThemeFolder>
+    <file name="theme.toml">
+        <content>
+            [theme]
+            name = "{{ themeName }}"
+            [colors]
+            base = "#6e738d" # Базовый фон
+            main_text = "#cad3f5" # Основной текст
+            alt_text = "#8aadf4" # Второй текст
+        </content>
+    </file>
+    <file name="theme.py">
+        <content>
+            from PySide6.QtGui import QColor, QFont
+
+            from ColorControl.theme import Theme
+            from API.config import Config
+
+            from attrs import define, field
+
+            ThemeConfig = Config("{{ themeName }}", "theme", "theme")
+            @define
+            class {{ themeName }}(Theme):
+                baseColor: QColor = field(default=QColor(ThemeConfig.data.colors.base))
+                mainTextColor: QColor = field(default=QColor(ThemeConfig.data.colors.main_text))
+                altTextColor: QColor = field(default=QColor(ThemeConfig.data.colors.alt_text))
+                font: QFont = field(default=QFont("Montserrat", 12, 700))
+
+                def preInitTheme(self, *args): ...
+
+                def postInitTheme(self, *args): ...
+        </content>
+    </file>
+</ThemeFolder>
