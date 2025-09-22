@@ -1,59 +1,33 @@
+from collections import namedtuple
 from pathlib import Path
 
-from .util import toCamelCase
+from .util import toCamelCase, buildEnv, buildFileContent, getAppPath
 
-dataConfigWindow = """
-[window]
-width = 220
-height = 75
-styleFile = "style.css"
-opacity = 1
-"""
-
-dataConfigWidget = """
-[widget]
-styleFile = "style.css"
-"""
-
-dataHeader = """
-from .{pluginNameCamel} import {pluginName}
-
-"""
-
-dataInitWindow = """
-def createWindow(parent):
-    return {pluginName}(parent)
-"""
-
-dataInitWidget = """
-def createWidget(parent):
-    return {pluginName}(parent)
-"""
+env = buildEnv(getAppPath() / "datas/PluginFolder.xml")
+DataRender = namedtuple("DataRender", ["isWidget", "isWindow"])
 
 
 def createFolderPlugin(name: str, root: Path, types: list):
     nameCamel = toCamelCase(name)
+    dr = DataRender("widget" in types, "window" in types)
     
     folder = root / name
     initFile = folder / "__init__.py"
     mainFile = folder / f"{nameCamel}.py"
     configFile = folder / "config.toml"
     styleFile = folder / "style.css"
+    metadataFile = folder / "metadata.toml"
     
     folder.mkdir(exist_ok=True)
-    initFile.touch(exist_ok=True)
-    mainFile.touch(exist_ok=True)
-    configFile.touch(exist_ok=True)
-    styleFile.touch(exist_ok=True)
     
-    dataInit = dataHeader.format(pluginNameCamel=nameCamel, pluginName=name)
-    dataConfig = ""
-    if "window" in types:
-        dataInit += dataInitWindow.format(pluginNameCamel=nameCamel, pluginName=name)
-        dataConfig += dataConfigWindow
-    if "widget" in types:
-        dataInit += dataInitWidget.format(pluginNameCamel=nameCamel, pluginName=name)
-        dataConfig += dataConfigWidget
+    contentInitFile = env.get_template("__init__.py").render(data=dr, pluginName=name)
+    contentMainFile = ""
+    contentConfigFile = env.get_template("config.toml").render(data=dr, pluginName=name)
+    contentStyleFile = ""
+    contentMetadataFile = env.get_template("metadata.toml").render(data=dr, pluginName=name)
     
-    initFile.write_text(dataInit, "UTF-8")
-    configFile.write_text(dataConfig)
+    buildFileContent(initFile, contentInitFile)
+    buildFileContent(mainFile, contentMainFile)
+    buildFileContent(configFile, contentConfigFile)
+    buildFileContent(styleFile, contentStyleFile)
+    buildFileContent(metadataFile, contentMetadataFile)

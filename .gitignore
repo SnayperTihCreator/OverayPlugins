@@ -199,3 +199,4 @@ cython_debug/
 /plugins/collected/
 /plugins/pack/
 /plugins/tools/
+/tests/

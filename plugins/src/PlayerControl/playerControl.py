@@ -24,34 +24,40 @@ class PlayerControl(OWindow):
         self.central_widget.setLayout(self.box)
         
         self.btn_play_pause = QPushButton()
+        self.btn_play_pause.setMinimumHeight(self.config.data.icons.size+2)
         self.btn_play_pause.setIconSize(sizeIcon)
         self.btn_play_pause.pressed.connect(lambda: self.toggle_play_pause())
         
         self.btn_next_track = QPushButton()
+        self.btn_next_track.setMinimumHeight(self.config.data.icons.size + 2)
         self.btn_next_track.setIconSize(sizeIcon)
         self.btn_next_track.pressed.connect(
             lambda: self.send_media_key(PlayerCode.NEXT_TRACK)
         )
         
         self.btn_prev_track = QPushButton()
+        self.btn_prev_track.setMinimumHeight(self.config.data.icons.size + 2)
         self.btn_prev_track.setIconSize(sizeIcon)
         self.btn_prev_track.pressed.connect(
             lambda: self.send_media_key(PlayerCode.PREV_TRACK)
         )
         
         self.btn_vol_up = QPushButton()
+        self.btn_vol_up.setMinimumHeight(self.config.data.icons.size + 2)
         self.btn_vol_up.setIconSize(sizeIcon)
         self.btn_vol_up.pressed.connect(
             lambda: self.send_media_key(PlayerCode.VOLUME_UP)
         )
         
         self.btn_vol_down = QPushButton()
+        self.btn_vol_down.setMinimumHeight(self.config.data.icons.size + 2)
         self.btn_vol_down.setIconSize(sizeIcon)
         self.btn_vol_down.pressed.connect(
             lambda: self.send_media_key(PlayerCode.VOLUME_DOWN)
         )
         
         self.btn_vol_mute = QPushButton()
+        self.btn_vol_mute.setMinimumHeight(self.config.data.icons.size + 2)
         self.btn_vol_mute.setIconSize(sizeIcon)
         self.btn_vol_mute.pressed.connect(
             lambda: self.send_media_key(PlayerCode.VOLUME_MUTE)
@@ -66,8 +72,9 @@ class PlayerControl(OWindow):
         self.box.addWidget(self.btn_vol_mute)
         
         self.header = QPushButton()
+        self.header.setMinimumHeight(self.config.data.icons.size + 2)
         self.header.setObjectName("Header")
-        self.header.setIconSize(QSize(20, 20))
+        self.header.setIconSize(sizeIcon)
         self.header.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, True)
         
         self.box.insertWidget(0, self.header)

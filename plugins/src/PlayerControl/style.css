@@ -5,9 +5,9 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: #{{ theme.hovered() }};
+    background-color: {{ theme.hovered() | color }};
 }
 
 QPushButton:pressed {
-    background-color: #{{ theme.pressed() }};
+    background-color: {{ theme.pressed() | color }};
 }

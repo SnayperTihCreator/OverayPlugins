@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.building.build_main import Analysis
+# noinspection PyUnresolvedReferences
+from PyInstaller.building.api import EXE, COLLECT, PYZ, logger
 
 a = Analysis(
     ['tools/src/pluginsTools.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[("tools/src/datas/", "datas")],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
