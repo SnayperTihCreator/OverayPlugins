@@ -4,7 +4,6 @@ from typing import Optional
 from PySide6.QtGui import QLinearGradient, QBrush
 from PySide6.QtWidgets import QVBoxLayout, QWidget, QComboBox, QPushButton
 from PySide6.QtCore import Qt, QTimer
-from box import Box
 
 from API import Config, OWindow, WindowConfigData
 from API.OWindow.pluginSettingWindow import PluginSettingWindow
@@ -198,14 +197,13 @@ class Visualisation(OWindow):
     def createSettingWidget(cls, window: "DraggableWindow", name_plugin: str, parent):
         return CustomPluginWindow(window, name_plugin, parent)
     
-    def restoreConfig(self, config):
-        super().restoreConfig(config)
-        if isinstance(config.idx_device, Box) or config.idx_device <= 0: return
+    def __restore_config__(self, config):
+        super().__restore_config__(config)
         self.idx_device = config.idx_device
         self.updateStream()
     
-    def savesConfig(self):
-        data = super().savesConfig()
+    def __save_config__(self):
+        data = super().__save_config__()
         return data | {
             "idx_device": self.idx_device
         }
