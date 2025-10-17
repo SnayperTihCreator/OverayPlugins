@@ -99,6 +99,20 @@ def buildPlugin(
         typer.secho(f"Плагин успешно собран {result}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+        
+        
+@builder.command(name="oaddons", help="Собрать Overlay дополнение")
+def buildOAddons(
+        build_file: Path = typer.Argument(..., help="Путь к файлу сборки"),
+        path_output: Path = typer.Argument(..., help="Выходная папка"),
+
+):
+    dataToml = utils.parseBuildFile(build_file)
+    try:
+        result = utils.buildOAddons(dataToml, path_output)
+        typer.secho(f"Overlay дополнение успешно собран {result}", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
 
 @builder.command(name="pack", help="Собрать пакет")
