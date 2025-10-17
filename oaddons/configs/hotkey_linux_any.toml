@@ -1,0 +1,7 @@
+[plugin]
+path = "oaddons/src/hotkey_linux_any"
+
+[build]
+exclude = []
+
+[platform]

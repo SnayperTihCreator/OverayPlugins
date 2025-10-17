@@ -1,0 +1,7 @@
+[plugin]
+path = "oaddons/src/hotkey_win32_any"
+
+[build]
+exclude = []
+
+[platform]
