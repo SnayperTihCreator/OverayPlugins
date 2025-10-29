@@ -37,6 +37,20 @@ def createPlugin(
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
 
 
+@creator.command(name="oaddons", help="Создать папку OAddons")
+def createOAddons(
+        name: str = typer.Argument(..., help="Имя плагина"),
+        path: Path = typer.Argument(..., help="Путь корневой папки плагина"),
+        platform: str = typer.Argument(..., help="Платформа"),
+        window: str = typer.Argument(..., help="Оконый манаджер")
+):
+    try:
+        tools.createFolderOAddons(name, path.absolute(), platform, window)
+        typer.secho("Репозиторий плагина создан", fg=typer.colors.BRIGHT_GREEN)
+    except Exception as e:
+        typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
 @creator.command(name="tools", help="Создать папку зависимостей")
 def createTools(
         name: str = typer.Argument(..., help="Имя плагина"),
@@ -99,8 +113,8 @@ def buildPlugin(
         typer.secho(f"Плагин успешно собран {result}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
-        
-        
+
+
 @builder.command(name="oaddons", help="Собрать Overlay дополнение")
 def buildOAddons(
         build_file: Path = typer.Argument(..., help="Путь к файлу сборки"),

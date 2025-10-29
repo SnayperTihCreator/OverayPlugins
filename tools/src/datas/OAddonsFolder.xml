@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OAddonsFolder>
+    <file name="metadata.toml">
+        <content>
+            name = "{{ name | title }}({{ data.platform | title }})"
+            author = "&lt;unknown&gt;"
+            version = "1.0.0-stable"
+            platform = "{{ data.platform }}"
+            window = "{{ data.window }}"
+        </content>
+    </file>
+    <file name="__init__.py">
+        <content>
+
+        </content>
+    </file>
+</OAddonsFolder>

@@ -2,6 +2,8 @@
 <ThemeFolder>
     <file name="theme.toml">
         <content>
+            docs = "&lt;unknown&gt;"
+            version = "release 1.0.0"
             [theme]
             name = "{{ themeName }}"
             [colors]
