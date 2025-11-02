@@ -1,0 +1,7 @@
+[plugin]
+path = "oaddons/src/yaml_storage"
+
+[build]
+exclude = []
+
+[platform]
