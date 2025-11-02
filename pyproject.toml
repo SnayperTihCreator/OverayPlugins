@@ -1,8 +1,6 @@
 [project]
 name = "overayplugins"
 version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "api-stubs",
@@ -19,6 +17,7 @@ dependencies = [
     "pyinstaller>=6.15.0",
     "pyside6==6.9.0",
     "pyyaml>=6.0.2",
+    "stubgen",
     "toml>=0.10.2",
     "typer>=0.16.1",
 ]
@@ -30,3 +29,4 @@ apiservice-stubs = { path = "wheel/apiservice_stubs-0.1.0-py3-none-any.whl" }
 colorcontrol-stubs = { path = "wheel/colorcontrol_stubs-0.1.0-py3-none-any.whl" }
 common-stubs = { path = "wheel/common_stubs-0.1.0-py3-none-any.whl" }
 pathcontrol-stubs = { path = "wheel/pathcontrol_stubs-0.1.0-py3-none-any.whl" }
+stubgen = { path = "wheel/stubgen-0.1.2-py3-none-any.whl" }

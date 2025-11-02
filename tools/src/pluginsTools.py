@@ -41,8 +41,8 @@ def createPlugin(
 def createOAddons(
         name: str = typer.Argument(..., help="Имя плагина"),
         path: Path = typer.Argument(..., help="Путь корневой папки плагина"),
-        platform: str = typer.Argument(..., help="Платформа"),
-        window: str = typer.Argument(..., help="Оконый манаджер")
+        platform: str = typer.Argument("", help="Платформа"),
+        window: str = typer.Argument("", help="Оконый манаджер")
 ):
     try:
         tools.createFolderOAddons(name, path.absolute(), platform, window)

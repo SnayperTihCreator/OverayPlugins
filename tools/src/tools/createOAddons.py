@@ -10,7 +10,13 @@ DataRender = namedtuple("DataRender", ["platform", "window"])
 def createFolderOAddons(name: str, root: Path, platform: str, window: str):
     dr = DataRender(platform, window)
     
-    folder = root / f"{name}_{platform}_{window}"
+    folderName = name
+    if platform:
+        folderName += f"_{platform}"
+    if window:
+        folderName += f"_{window}"
+    
+    folder = root / folderName
     initFile = folder / "__init__.py"
     metadataFile = folder / "metadata.toml"
     

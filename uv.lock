@@ -220,6 +220,7 @@ dependencies = [
     { name = "pyinstaller" },
     { name = "pyside6" },
     { name = "pyyaml" },
+    { name = "stubgen" },
     { name = "toml" },
     { name = "typer" },
 ]
@@ -240,6 +241,7 @@ requires-dist = [
     { name = "pyinstaller", specifier = ">=6.15.0" },
     { name = "pyside6", specifier = "==6.9.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
+    { name = "stubgen", path = "wheel/stubgen-0.1.2-py3-none-any.whl" },
     { name = "toml", specifier = ">=0.10.2" },
     { name = "typer", specifier = ">=0.16.1" },
 ]
@@ -562,6 +564,20 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/e2/6e/cf00d723ab141132fb6d35ba8faf109cbc0ee83412016343600abb423149/shiboken6-6.9.0-cp39-abi3-win_amd64.whl", hash = "sha256:121ea290ed1afa5ad6abf690b377612693436292b69c61b0f8e10b1f0850f935", size = 1153132 },
     { url = "https://files.pythonhosted.org/packages/b5/01/d59babab05786c99ebabdd152864ea3d4c500160979952c620eec68b1ff2/shiboken6-6.9.0-cp39-abi3-win_arm64.whl", hash = "sha256:24f53857458881b54798d7e35704611d07f6b6885bcdf80f13a4c8bb485b8df2", size = 1831261 },
 ]
+
+[[package]]
+name = "stubgen"
+version = "0.1.2"
+source = { path = "wheel/stubgen-0.1.2-py3-none-any.whl" }
+dependencies = [
+    { name = "setuptools" },
+]
+wheels = [
+    { filename = "stubgen-0.1.2-py3-none-any.whl", hash = "sha256:f13ef917927762484fea802d3c5172ad1aa6561f1c6de339d329fc778af7f25b" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "setuptools", specifier = ">=80.9.0" }]
 
 [[package]]
 name = "toml"
