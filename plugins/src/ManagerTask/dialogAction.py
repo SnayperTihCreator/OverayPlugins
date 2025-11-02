@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QDialog, QTableWidgetItem, QHeaderView
+from PySide6.QtWidgets import QDialog
 
 from .tasks import Action
 
 from .uis.dialogActions_ui import Ui_dialogAction
+from .modelData import ManagerTaskDelegate, ModelAction
 
 
 class DialogAction(QDialog, Ui_dialogAction):
@@ -10,22 +11,10 @@ class DialogAction(QDialog, Ui_dialogAction):
         super().__init__(parent)
         self.setupUi(self)
         
-        self.tableWidget.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-        
-        self.actions = []
+        self._modelAction = ModelAction()
+        self._delegate = ManagerTaskDelegate(self.listView)
+        self.listView.setItemDelegate(self._delegate)
+        self.listView.setModel(self._modelAction)
         
         for action in actions:
-            self.add_action(action)
-    
-    def add_action(self, action: Action):
-        idx = self.tableWidget.rowCount()
-        self.tableWidget.insertRow(idx)
-        
-        itemExecutor = QTableWidgetItem(action.executor.description)
-        self.tableWidget.setItem(idx, 0, itemExecutor)
-        itemStatus = QTableWidgetItem(action.status.name)
-        self.tableWidget.setItem(idx, 1, itemStatus)
-        itemTrigger = QTableWidgetItem(action.trigger.description)
-        self.tableWidget.setItem(idx, 2, itemTrigger)
-        
-        self.actions.append(action)
+            self._modelAction.addAction(action)

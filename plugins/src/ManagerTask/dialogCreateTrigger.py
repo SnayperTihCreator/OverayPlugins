@@ -1,11 +1,10 @@
 from typing import Optional
 
-from PySide6.QtWidgets import QDialog, QWidget, QListWidgetItem
+from PySide6.QtWidgets import QDialog, QWidget
 from PySide6.QtCore import Qt
 
 from .uis.dialogCreateTrigger_ui import Ui_dialogCreateTrigger
 from .tasks.triggers import *
-from .tasks import BaseTrigger
 
 triggers = [AbsoluteDateTimeTrigger, RelativeDateTimeTrigger]
 
@@ -14,6 +13,7 @@ class CreateDialogTrigger(QDialog, Ui_dialogCreateTrigger):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.frameTriggers.hide()
         self.whatCallComboBox.currentIndexChanged.connect(self.actChoseTrig)
         for trig in triggers:
             self.whatCallComboBox.addItem(trig.display_name, userData=trig)

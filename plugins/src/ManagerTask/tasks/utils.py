@@ -1,17 +1,15 @@
 import subprocess
 import threading
-import atexit
 import os
 import sys
-import signal
+import typing
 from typing import Callable, Optional
 
 
 def run_detached(
         command: list[str] | str,
         on_error: Optional[Callable[[int, str], None]] = None,
-        on_result: Optional[Callable[[str], None]] = None,
-        on_close: bool = True
+        on_result: Optional[Callable[[str], None]] = None
 ) -> subprocess.Popen:
     """
     Запускает команду в фоне, убивает при выходе родителя и вызывает callback при ошибке.
@@ -51,16 +49,44 @@ def run_detached(
             on_result(result_msg)
     
     threading.Thread(target=monitor_process, daemon=True).start()
-    
-    def cleanup():
-        """Убивает дочерний процесс при выходе родителя."""
-        if process.poll() is None:  # Если ещё работает
-            if sys.platform == 'win32':
-                process.terminate()  # SIGTERM
-            else:
-                os.killpg(os.getpgid(process.pid), signal.SIGTERM)  # Убиваем группу
-            process.wait()  # Ожидаем завершения (опционально)
-    
-    if on_close:
-        atexit.register(cleanup)  # Гарантированное завершение
     return process
+
+
+def check_type_simple(value: typing.Any, expected_type) -> bool:
+    try:
+        # Any пропускает любые значения
+        if expected_type is typing.Any:
+            return True
+        
+        # Если expected_type - строка, ищем в MRO value
+        if isinstance(expected_type, str):
+            # Получаем все классы из MRO
+            mro_classes = value.__class__.__mro__
+            
+            # Ищем класс с нужным именем в MRO
+            for cls in mro_classes:
+                if cls.__name__ == expected_type:
+                    return True
+            return False
+        
+        # Прямая проверка для обычных типов
+        if isinstance(expected_type, type):
+            return isinstance(value, expected_type)
+        
+        # Union types
+        origin = typing.get_origin(expected_type)
+        if origin is typing.Union:
+            return any(check_type_simple(value, t) for t in typing.get_args(expected_type))
+        
+        # Optional
+        if origin is typing.Optional:
+            return value is None or check_type_simple(value, typing.get_args(expected_type)[0])
+        
+        # Для остальных случаев пытаемся использовать isinstance с origin
+        if origin is not None:
+            return isinstance(value, origin)
+        
+        return False
+    except (TypeError, AttributeError):
+        # Если проверка не удалась, считаем что тип не совпадает
+        return False

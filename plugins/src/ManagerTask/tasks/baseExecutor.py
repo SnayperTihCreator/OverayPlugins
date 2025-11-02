@@ -1,26 +1,21 @@
 from abc import abstractmethod
 from typing import Any
 
-from PySide6.QtCore import Signal, QRunnable, QThreadPool, Slot
+from PySide6.QtCore import QRunnable, QThreadPool, Slot, QTimer
 from attrs import define, field
 
-from .core import QABCObject
-
-
-
+from OExtension.yaml_storage import YamlSerialized
+from .signals import Signal
 
 
 @define(slots=False)
-class BaseExecutor(QABCObject):
+class BaseExecutor(YamlSerialized):
     display_name = "<unknown>"
     
     result: Any = field(default=None, init=False)
     error: str = field(default="", init=False)
     
     finished = Signal(bool)
-    
-    def __attrs_post_init__(self):
-        super().__init__()
     
     def clear(self):
         self.result = None
@@ -58,8 +53,14 @@ class ExecutorTask(QRunnable):
     def run(self, /):
         try:
             self.executor.execute()
-            self.executor.finished.emit(True)
+            self._finished(True)
         except Exception as e:
             self.executor.error = str(e)
-            self.executor.finished.emit(False)
+            self._finished(False)
     
+    def _finished(self, status):
+        
+        def invoke():
+            self.executor.finished(status)
+        
+        QTimer.singleShot(0, invoke)

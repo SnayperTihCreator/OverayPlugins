@@ -1,19 +1,20 @@
-from PySide6.QtWidgets import QTableWidgetItem, QMenu
-from PySide6.QtCore import Qt, Signal, Slot, QThreadPool, QTimer, QDeadlineTimer
+from PySide6.QtWidgets import QMenu
+from PySide6.QtCore import Qt, Slot, QThreadPool, QDeadlineTimer
 
-from API import Config, OWidget, saveResource, loadResource
+from API import Config, OWidget
+
+from OExtension.yaml_storage import Storage
 
 from .uis.main_ui import Ui_ManagerTask
 from .dialogCreateTask import CreateDialogTask
-from .tasks import Task, TaskStatus
+from .tasks import TaskStatus
 from .dialogAction import DialogAction
 from .config import ManagerTaskConfig
+from .modelData import ModelTask, ManagerTaskDelegate, ManagerTaskRole
 
 
 class ManagerTask(OWidget, Ui_ManagerTask):
     """Главный менеджер задач с Qt-интеграцией"""
-    
-    task_status_changed = Signal(int, TaskStatus)  # Сигнал изменения статуса задачи
     
     def __init__(self, parent):
         super().__init__(Config("ManagerTask", "widget", scheme=ManagerTaskConfig), parent)
@@ -22,105 +23,76 @@ class ManagerTask(OWidget, Ui_ManagerTask):
             Qt.AnchorPoint.AnchorHorizontalCenter,
             Qt.AnchorPoint.AnchorBottom
         )
+        self._storage = Storage()
         QThreadPool.globalInstance().setMaxThreadCount(4)
         
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self._tasksModel = ModelTask()
+        self._tasksModel.dataChanged.connect(self._on_data_change)
+        self._delegate = ManagerTaskDelegate(self.listView)
+        self.listView.setItemDelegate(self._delegate)
+        self.listView.setModel(self._tasksModel)
         
-        self._tasks: list[Task] = []
-        
-        # Настройка таблицы
-        self.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.tableWidget.customContextMenuRequested.connect(self._show_context_menu)
+        self.listView.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.listView.customContextMenuRequested.connect(self._show_context_menu)
         
         # Сигналы
         self.btnCreateTask.pressed.connect(self._create_task)
-        self.task_status_changed.connect(self._update_task_status)
-    
-    @Slot(int, TaskStatus)
-    def _update_task_status(self, row: int, status: TaskStatus):
-        """Обновление UI должно происходить только в главном потоке"""
-        if 0 <= row < self.tableWidget.rowCount():
-            item = QTableWidgetItem(status.name)
-            self.tableWidget.setItem(row, 2, item)
+        
+    def _on_data_change(self, idx1, idx2, roles):
+        if ManagerTaskRole.StatusRole in roles:
+            self.saveTasks()
+        
+    def saveTasks(self):
+        try:
+            with open(f"pldata://{self.config.name}/{self.config.data.tasks.path}", "w", encoding="utf-8") as file:
+                self._storage.dump(self._tasksModel.tasks(), file)
+        except Exception as e:
+            import traceback
+            print(*traceback.format_exception(e))
     
     def __process__(self):
-        if not self._tasks: return
-        sorted_tasks = sorted(self._tasks, key=lambda t: t.priority, reverse=True)
-        
+        if not self._tasksModel:
+            return
+        sorted_tasks = self._tasksModel.s_tasks()
+
         deadline = QDeadlineTimer(50)
-        
+
         for task in sorted_tasks:
             if deadline.hasExpired():
                 break
-            
+
             task.update()
-    
-    def get_task(self, row: int) -> Task:
-        """Получение задачи по строке таблицы"""
-        item = self.tableWidget.item(row, 0)
-        return item.data(Qt.ItemDataRole.UserRole)
-    
-    @Slot(int, TaskStatus)
-    def _update_task_status(self, row: int, status: TaskStatus):
-        """Обновление статуса задачи в таблице"""
-        item = QTableWidgetItem(status.name)
-        self.tableWidget.setItem(row, 2, item)
     
     def _create_task(self):
         """Создание новой задачи через диалог"""
         dialog = CreateDialogTask(self)
         if dialog.exec():
-            task = dialog.getItem()
-            self.add_task(task)
-    
-    def add_task(self, task: Task):
-        """Добавление задачи в таблицу"""
-        self._tasks.append(task)
-        row = self.tableWidget.rowCount()
-        task.status_changed.connect(lambda status: self._update_task_status(row, status))
-        self.tableWidget.insertRow(row)
-        
-        # Создание элементов таблицы
-        uid_item = QTableWidgetItem(task.uid)
-        uid_item.setData(Qt.ItemDataRole.UserRole, task)
-        
-        name_item = QTableWidgetItem(task.name if len(task.name) >= 4 else "<unknown>")
-        status_item = QTableWidgetItem(task.status.name)
-        
-        # Установка элементов в таблицу
-        self.tableWidget.setItem(row, 0, uid_item)
-        self.tableWidget.setItem(row, 1, name_item)
-        self.tableWidget.setItem(row, 2, status_item)
+            self._tasksModel.addTask(dialog.getItem())
     
     @Slot()
     def _show_context_menu(self, pos):
         """Показ контекстного меню для задачи"""
-        item = self.tableWidget.itemAt(pos)
-        if not item:
+        idx = self.listView.indexAt(pos)
+        if not idx:
             return
-        
-        row = item.row()
-        task = self.get_task(row)
-        
+        task = self._tasksModel.getTask(idx.row())
+
         menu = QMenu(self)
         actions = {
             "delete": menu.addAction("Delete Task"),
-            "cancel": menu.addAction("Cancel Task"),
-            "restart": menu.addAction("Restart Task"),
+            "cancel": menu.addAction("Cancel Task") if not task.is_finish() else None,
+            "restart": menu.addAction("Restart Task") if task.status != TaskStatus.IDLE else None,
             "show_action": menu.addAction("Show actions")
         }
-        
-        action = menu.exec(self.tableWidget.mapToGlobal(pos))
-        
+
+        action = menu.exec(self.listView.mapToGlobal(pos))
+
         if action == actions["delete"]:
-            self.tableWidget.removeRow(row)
-            self._tasks.remove(task)
+            self._tasksModel.removeItem(idx)
         elif action == actions["cancel"]:
             task.cancel()
-            self._update_task_status(row, task.status)
         elif action == actions["restart"]:
             task.restart()
-            self._update_task_status(row, task.status)
         elif action == actions["show_action"]:
             dialog = DialogAction(task.actions, self)
             dialog.show()
@@ -128,24 +100,14 @@ class ManagerTask(OWidget, Ui_ManagerTask):
     def __ready__(self):
         """Загрузка сохраненных задач"""
         try:
-            tasks = loadResource(
-                self.config.data.tasks.path,
-                self.config
-            )
+            with open(f"pldata://{self.config.name}/{self.config.data.tasks.path}", encoding="utf-8") as file:
+                tasks = self._storage.load(file)
             for task in tasks:
-                self.add_task(task)
+                self._tasksModel.addTask(task)
         except FileNotFoundError as e:
             print(type(e), e)
         super().__ready__()
         
     def __save_config__(self) -> dict:
-        try:
-            saveResource(
-                self.config.data.tasks.path,
-                self.config,
-                self._tasks
-            )
-        except Exception as e:
-            import traceback
-            print(*traceback.format_exception(e))
+        self.saveTasks()
         return super().__save_config__()

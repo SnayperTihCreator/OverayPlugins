@@ -15,6 +15,7 @@ class CreateDialogAction(QDialog, Ui_dialogCreateAction):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.frameActions.hide()
         self.whatCallComboBox.currentIndexChanged.connect(self.actChoseExecutor)
         self.btnCreateTrigger.pressed.connect(self.actCreateTrigger)
         for exec_ in executors:

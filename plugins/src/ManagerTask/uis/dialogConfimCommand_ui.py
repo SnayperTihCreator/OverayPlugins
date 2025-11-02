@@ -24,13 +24,16 @@ class Ui_Info(object):
         if not Info.objectName():
             Info.setObjectName(u"Info")
         Info.resize(400, 300)
+        font = QFont()
+        font.setFamilies([u"Segoe UI"])
+        Info.setFont(font)
         self.verticalLayout = QVBoxLayout(Info)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.label = QLabel(Info)
         self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignHCenter|Qt.AlignTop)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignHCenter|Qt.AlignmentFlag.AlignTop)
 
         self.horizontalLayout.addWidget(self.label)
 
@@ -42,10 +45,15 @@ class Ui_Info(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.timeLeft = QLabel(Info)
+        self.timeLeft.setObjectName(u"timeLeft")
+
+        self.verticalLayout.addWidget(self.timeLeft)
+
         self.buttonBox = QDialogButtonBox(Info)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.verticalLayout.addWidget(self.buttonBox)
 
@@ -60,5 +68,6 @@ class Ui_Info(object):
     def retranslateUi(self, Info):
         Info.setWindowTitle(QCoreApplication.translate("Info", u"Dialog", None))
         self.label.setText("")
+        self.timeLeft.setText("")
     # retranslateUi
 

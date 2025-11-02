@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import yaml
 
-from .core import registry_to_yaml, registry_from_yaml
+from OExtension.yaml_storage import register_load, register_dump
 
 
 def rep_datetime(dumper: yaml.Dumper, data: datetime):
@@ -13,8 +13,8 @@ def con_datetime(loader: yaml.Loader, node):
     return datetime.fromisoformat(loader.construct_scalar(node))
 
 
-registry_to_yaml(datetime, rep_datetime)
-registry_from_yaml("!datetime", con_datetime)
+register_dump(datetime, rep_datetime)
+register_load("!datetime", con_datetime)
 
 
 def rep_dt(dumper: yaml.Dumper, data: timedelta):
@@ -25,5 +25,5 @@ def con_dt(loader: yaml.Loader, node):
     return timedelta(seconds=int(loader.construct_scalar(node)))
 
 
-registry_to_yaml(timedelta, rep_dt)
-registry_from_yaml("!timedelta", con_dt)
+register_dump(timedelta, rep_dt)
+register_load("!timedelta", con_dt)

@@ -1,17 +1,13 @@
 from abc import abstractmethod
-from PySide6.QtCore import Signal
 from attrs import define, field
 
-from .core import QABCObject
+from OExtension.yaml_storage import YamlSerialized
 
 
-class BaseTrigger(QABCObject):
+class BaseTrigger(YamlSerialized):
     display_name = "<unknown>"
     
     # Сигналы для триггеров
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
     
     def stop(self):
         self.clearTrig()
@@ -42,12 +38,9 @@ class BaseTrigger(QABCObject):
         pass
 
 
-@define(slots=False)
+@define
 class AndTrigger(BaseTrigger):
     triggers: list[BaseTrigger] = field(factory=list)
-    
-    def __attrs_post_init__(self):
-        super().__init__()
     
     def clearTrig(self):
         for trigger in self.triggers:
@@ -88,12 +81,9 @@ class AndTrigger(BaseTrigger):
         return False
 
 
-@define(slots=False)
+@define
 class OrTrigger(BaseTrigger):
     triggers: list[BaseTrigger] = field(factory=list)
-    
-    def __attrs_post_init__(self):
-        super().__init__()
     
     def clear(self):
         for trigger in self.triggers:

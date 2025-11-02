@@ -1,14 +1,15 @@
 from enum import Enum, auto
 from typing import Any
-import yaml
 from attrs import define, field
-from PySide6.QtCore import Signal
 
-from .core import QABCObject, registry_to_yaml, registry_from_yaml
+from OExtension.yaml_storage import yaml_enum_serialized, YamlSerialized
+
 from .baseTriggers import BaseTrigger
 from .baseExecutor import BaseExecutor
+from .signals import Signal
 
 
+@yaml_enum_serialized
 class ActionStatus(Enum):
     IDLE = auto()
     RUNNING = auto()
@@ -16,36 +17,24 @@ class ActionStatus(Enum):
     FAILED = auto()
     CANCELLED = auto()
     
-    @classmethod
-    def to_yaml(cls, dumper: yaml.Dumper, data):
-        return dumper.represent_scalar("!ActionStatus", str(data.value))
+    def save(self):
+        return str(self.value)
     
     @classmethod
-    def from_yaml(cls, loader: yaml.Loader, node):
-        data = loader.construct_scalar(node)
+    def restore(cls, data):
         return cls(int(data))
 
 
-registry_to_yaml(ActionStatus, ActionStatus.to_yaml)
-registry_from_yaml("!ActionStatus", ActionStatus.from_yaml)
-
-
 @define(slots=False)
-class Action(QABCObject):
-    """Упрощённая реализация Action с Qt-интеграцией"""
-    
-    # Qt сигналы
-    status_changed = Signal(ActionStatus)
-    error_occurred = Signal(str)
-    
+class Action(YamlSerialized):
     executor: BaseExecutor = field()
     trigger: BaseTrigger = field()
     status: ActionStatus = field(default=ActionStatus.IDLE, init=False)
     _error: str = field(default=None, init=False)
     _result: Any = field(default=None, init=False)
     
-    def __attrs_post_init__(self):
-        super().__init__()  # Инициализация QObject
+    status_changed = Signal(ActionStatus)
+    error_occurred = Signal(str)
     
     def cancel(self):
         """Оригинальная логика с сигналами"""
@@ -74,14 +63,12 @@ class Action(QABCObject):
             self._update_status(ActionStatus.SUCCESS if success else ActionStatus.CANCELLED)
             
             if self._error:
-                self.status = ActionStatus.FAILED
-                self.error_occurred.emit(self._error)
+                self._update_status(ActionStatus.FAILED)
     
     def _update_status(self, new_status):
         """Обновление статуса с уведомлением"""
         if self.status != new_status:
             self.status = new_status
-            self.status_changed.emit(new_status)
     
     # Оригинальные методы без изменений
     def is_finish(self):

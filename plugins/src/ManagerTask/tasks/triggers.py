@@ -5,8 +5,8 @@ from typing import Optional
 from attrs import define, field
 
 from .baseTriggers import BaseTrigger
-from . import installation_registry
 from .guiTriggers import *
+from . import installation_registry
 
 
 @define(slots=False)

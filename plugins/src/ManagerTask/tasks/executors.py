@@ -1,10 +1,12 @@
 from pathlib import Path
 from functools import partial
+from typing import Any
 
 from attrs import define, field
-from PySide6.QtCore import qWarning, QMetaObject, Q_ARG, Signal
+from PySide6.QtCore import qWarning
 
 from .baseExecutor import BaseExecutor
+from .signals import Signal
 from .utils import run_detached
 from .guiExecutors import *
 
@@ -18,10 +20,9 @@ class RunCommandExecutor(BaseExecutor):
     _dialog: DialogConfirmCommand = field(default=None, init=False, repr=False)
     
     error_raised = Signal(int, str)
-    result_changed = Signal(object)
+    result_changed = Signal(Any)
     
     def __attrs_post_init__(self):
-        super().__attrs_post_init__()
         self._dialog = DialogConfirmCommand(10)
         
         self.error_raised.connect(self.actOnSetError)
@@ -48,7 +49,7 @@ class RunCommandExecutor(BaseExecutor):
         return widget, partial(widget.callback, cls)
     
     def execute(self):
-        run_detached(self.command, self.error_raised.emit, self.result_changed.emit, False)
+        run_detached(self.command, self.error_raised.emit, self.result_changed.emit)
         
     def __call__(self):
         if self._is_messageCheck:
@@ -81,13 +82,10 @@ class RunAppExecutor(BaseExecutor):
     args: str = field(default="")
     
     error_raised = Signal(int, str)
-    result_changed = Signal(object)
+    result_changed = Signal(Any)
     
     def execute(self):
-        run_detached(f"{self.filePath} {self.args}", self.error_raised.emit, self.result_changed.emit, False)
-    
-    def __attrs_post_init__(self):
-        super().__attrs_post_init__()
+        run_detached(f"{self.filePath} {self.args}", self.error_raised.emit, self.result_changed.emit)
 
         self.error_raised.connect(self.actOnSetError)
         self.result_changed.connect(self.actOnSetResult)

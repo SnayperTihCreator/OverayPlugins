@@ -1,12 +1,14 @@
 from enum import Enum, auto
-import yaml
-from attrs import define, field
-from PySide6.QtCore import Signal
+from typing import Any
 
-from .core import QABCObject, registry_to_yaml, registry_from_yaml
+from attrs import define, field
+
+from OExtension.yaml_storage import yaml_enum_serialized, YamlSerialized
+from .signals import Signal
 from .actions import Action, ActionStatus
 
 
+@yaml_enum_serialized
 class TaskStatus(Enum):
     IDLE = auto()
     ACTIVE = auto()
@@ -15,25 +17,19 @@ class TaskStatus(Enum):
     ABORTED = auto()
     
     @classmethod
-    def to_yaml(cls, dumper: yaml.Dumper, data):
-        return dumper.represent_scalar("!TaskStatus", str(data.value))
-    
-    @classmethod
-    def from_yaml(cls, loader: yaml.Loader, node):
-        data = loader.construct_scalar(node)
+    def restore(cls, data):
         return cls(int(data))
-
-
-registry_to_yaml(TaskStatus, TaskStatus.to_yaml)
-registry_from_yaml("!TaskStatus", TaskStatus.from_yaml)
+    
+    def save(self):
+        return str(self.value)
 
 
 @define(slots=False)
-class Task(QABCObject):
+class Task(YamlSerialized):
     """Реализация Task с сохранением оригинальной логики и Qt-интеграцией"""
     
     # Сигналы состояния
-    status_changed = Signal(object)  # TaskStatus
+    status_changed = Signal(TaskStatus)  # TaskStatus
     
     name: str = field()
     uid: str = field()
