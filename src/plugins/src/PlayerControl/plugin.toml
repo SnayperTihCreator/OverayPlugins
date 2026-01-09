@@ -1,0 +1,17 @@
+[metadata]
+name = "PlayerControl"
+version = "2.0.0-stable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[settings]
+style_file = "style.css"
+
+[icons]
+size = 30
+modulate = "#fff"
+
+[settings.window]
+width = 50
+height = 250
+opacity = 0.8

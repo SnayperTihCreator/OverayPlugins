@@ -193,10 +193,9 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
-/plugins/src/tools/
-/temp/
-/plugins/src/Build plugin.exe
-/plugins/collected/
-/plugins/pack/
-/plugins/tools/
+
 /tests/
+/src/plugins/tools/
+/src/plugins/pack/
+*.hash
+

@@ -1,0 +1,13 @@
+[settings]
+style_file = "style.css"
+
+[metadata]
+name = "ManagerTask"
+version = "3.0.0-unstable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[tasks]
+path = "tasks.yml"
+
+[settings.widget]

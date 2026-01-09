@@ -1,0 +1,13 @@
+[metadata]
+name = "VolumeControl"
+version = "2.1.0-unstable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[settings]
+style_file = "style.css"
+
+[settings.window]
+width = 200
+height = 150
+opacity = 1.0

@@ -1,5 +1,0 @@
-[plugin]
-path="plugins/src/PlayerControl"
-[build]
-exclude = ["/icons", "*.qrc"]
-[platform]

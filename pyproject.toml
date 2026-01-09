@@ -3,30 +3,25 @@ name = "overayplugins"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
-    "api-stubs",
-    "apiplugins-stubs",
-    "apiservice-stubs",
     "attrs>=25.3.0",
-    "colorcontrol-stubs",
-    "common-stubs",
     "jinja2>=3.1.6",
     "json5>=0.12.1",
-    "pathcontrol-stubs",
+    "methodtools>=0.4.7",
+    "overlay-sdk",
     "pycaw>=20240210",
     "pydantic>=2.11.7",
     "pyinstaller>=6.15.0",
     "pyside6==6.9.0",
     "pyyaml>=6.0.2",
-    "stubgen",
     "toml>=0.10.2",
     "typer>=0.16.1",
 ]
 
 [tool.uv.sources]
-api-stubs = { path = "wheel/api_stubs-0.1.0-py3-none-any.whl" }
 apiplugins-stubs = { path = "wheel/apiplugins_stubs-0.1.0-py3-none-any.whl" }
 apiservice-stubs = { path = "wheel/apiservice_stubs-0.1.0-py3-none-any.whl" }
 colorcontrol-stubs = { path = "wheel/colorcontrol_stubs-0.1.0-py3-none-any.whl" }
 common-stubs = { path = "wheel/common_stubs-0.1.0-py3-none-any.whl" }
 pathcontrol-stubs = { path = "wheel/pathcontrol_stubs-0.1.0-py3-none-any.whl" }
 stubgen = { path = "wheel/stubgen-0.1.2-py3-none-any.whl" }
+overlay-sdk = { path = "wheel/overlay_sdk-1.0.0-py3-none-any.whl" }

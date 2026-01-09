@@ -1,0 +1,13 @@
+[metadata]
+name = "VisualisationWidget"
+version = "2.1.0-stable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[settings]
+style_file = "style.css"
+
+[settings.window]
+width = 400
+height = 200
+opacity = 0.5

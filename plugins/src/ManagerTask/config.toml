@@ -1,4 +1,0 @@
-[widget]
-styleFile = "style.css"
-[tasks]
-path="tasks.yml"

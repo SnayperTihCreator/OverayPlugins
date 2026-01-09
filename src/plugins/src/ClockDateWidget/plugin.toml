@@ -1,0 +1,17 @@
+[metadata]
+name = "ClockDateWidget"
+version = "2.1.0-stable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[settings]
+style_file = "style.css"
+
+[clock_format]
+date_format = "dd/MM/yyyy"
+time_format = "hh:mm:ss"
+
+[settings.window]
+width = 250
+height = 70
+opacity = 0.75

@@ -1,0 +1,16 @@
+[metadata]
+name = "PowerWidget"
+version = "2.1.0-stable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[settings]
+style_file = "style.css"
+
+[powerFormat]
+unitFormat = "%u%"
+
+[settings.window]
+width = 315
+height = 50
+opacity = 0.75
