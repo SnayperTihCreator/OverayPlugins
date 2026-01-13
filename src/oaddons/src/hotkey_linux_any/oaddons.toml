@@ -1,0 +1,9 @@
+[metadata]
+name = "Hotkey[Linux]"
+version = "1.0.0-stable"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[platform]
+platform = "win32"
+window = "any"

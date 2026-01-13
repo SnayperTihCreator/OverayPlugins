@@ -1,7 +1,10 @@
-
-[theme]
+[metadata]
 name = "Mocha"
-[colors]
-base = "#6c7086" # Базовый фон
-main_text = "#cdd6f4" # Основной текст
-alt_text = "#89b4fa" # Второй текст
+version = "release 1.0.0"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[palette]
+base = "#6c7086"
+main_text = "#cdd6f4"
+alt_text = "#89b4fa"

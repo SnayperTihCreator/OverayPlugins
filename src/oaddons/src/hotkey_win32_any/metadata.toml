@@ -1,5 +1,0 @@
-name = "Hotkey(Win32)"
-author = "SnayperTihCreator"
-version = "1.0.0-stable"
-platform = "win32"
-window = "any"

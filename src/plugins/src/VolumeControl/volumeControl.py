@@ -8,7 +8,6 @@ from .volumeRenderList import VolumeListModel, VolumeItemDelegate
 # noinspection PyUnresolvedReferences
 from . import icons_rc
 
-
 class CustomListView(QListView):
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())

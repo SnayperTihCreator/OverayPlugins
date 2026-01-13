@@ -18,7 +18,7 @@ class ClockDateWidget(OQMLWindow):
         self.setRootProperty("currentDateTime", QDateTime.currentDateTime())
         self.setRootProperty("timeFormat", self.config.data.clock_format.time_format)
         self.setRootProperty("dateFormat", self.config.data.clock_format.date_format)
-        
+    
     def __process__(self):
         self.setRootProperty("currentDateTime", QDateTime.currentDateTime())
     

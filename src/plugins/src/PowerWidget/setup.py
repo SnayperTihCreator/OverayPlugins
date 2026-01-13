@@ -1,8 +1,9 @@
 from overlay_sdk import setup
 
 setup(
-    kind="plugin",
+    kind="pack",
     name="PowerWidget",
     author="SnayperTihCreator",
-    version="2.1.0-stable"
+    version="2.1.0-stable",
+    platforms=["Windows","Linux"]
 )

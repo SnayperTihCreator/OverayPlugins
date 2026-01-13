@@ -1,7 +1,18 @@
+[metadata]
+name = "TestTheme"
+version = "1.0.0"
+author = "SnayperTihCreator"
+description = "<unknown>"
+
+[palette]
+base = "#f00"
+main_text = "#0f0"
+alt_text = "#00f"
 
 [theme]
 name = "TestTheme"
+
 [colors]
-base = "#f00" # Базовый фон
-main_text = "#0f0" # Основной текст
-alt_text = "#00f" # Второй текст
+base = "#f00"
+main_text = "#0f0"
+alt_text = "#00f"

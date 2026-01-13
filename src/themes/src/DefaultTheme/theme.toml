@@ -1,8 +1,10 @@
-docs = "Стандартаная тема"
-version = "release 1.0.0"
-[theme]
+[metadata]
 name = "DefaultTheme"
-[colors]
-base = "#6e738d" # Базовый фон
-main_text = "#cad3f5" # Основной текст
-alt_text = "#8aadf4" # Второй текст
+version = "release 1.0.0"
+author = "SnayperTihCreator"
+description = "Стандартаная тема"
+
+[palette]
+base = "#6e738d"
+main_text = "#cad3f5"
+alt_text = "#8aadf4"
