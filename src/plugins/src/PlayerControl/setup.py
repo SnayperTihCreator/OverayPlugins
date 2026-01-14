@@ -4,7 +4,7 @@ setup(
     kind="pack",
     name="PlayerControl",
     author="SnayperTihCreator",
-    version="2.0.0-stable",
+    version="3.0.0-stable",
     exclude_folders=["icons"],
-    platforms=["Windows", "Linux"]
+    platforms=["win32", "linux"]
 )

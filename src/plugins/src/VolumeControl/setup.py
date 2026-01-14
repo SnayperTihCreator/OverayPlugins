@@ -4,7 +4,7 @@ setup(
     kind="pack",
     name="VolumeControl",
     author="SnayperTihCreator",
-    version="2.1.0-unstable",
+    version="3.0.0-unstable",
     exclude_folders=["icons"],
-    platforms=["Windows", "Linux"],
+    platforms=["win32", "linux"]
 )

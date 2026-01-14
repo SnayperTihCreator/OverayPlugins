@@ -4,6 +4,6 @@ setup(
     kind="pack",
     name="ClockDateWidget",
     author="SnayperTihCreator",
-    version="2.1.0-stable",
-    platforms=["Windows", "Linux"]
+    version="3.0.0-stable",
+    platforms=["win32", "linux"]
 )

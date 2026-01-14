@@ -6,5 +6,5 @@ setup(
     author="SnayperTihCreator",
     version="3.0.0-unstable",
     exclude_files=["*.ui"],
-    platforms=["Windows", "Linux"]
+    platforms=["win32", "linux"]
 )

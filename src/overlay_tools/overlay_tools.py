@@ -5,15 +5,12 @@ from pathlib import Path
 import typer
 from overlay_sdk import BaseProject
 
-from unpacked import unpacked
+from unpacked import smart_unpacked
 
 app = typer.Typer()
 
-creator = typer.Typer()
-app.add_typer(creator, name="create", help="Создание определенного формата файлов")
 
-
-@creator.command(name="setup", help="Создать setup.py")
+@app.command(name="create-setup", help="Создать setup.py")
 def createSetup(
         kind: str = typer.Argument(..., help="Тип setup.py"),
         name: str = typer.Argument(..., help="Имя структуры"),
@@ -22,33 +19,6 @@ def createSetup(
     BaseProject.create_setup_file(kind, dist, {"name": name})
 
 
-@creator.command(name="project", help="Создать проект")
-def createProject(
-        kind: str = typer.Argument(..., help="Тип проекта"),
-        name: str = typer.Argument(..., help="Имя структуры"),
-        dist: Path = typer.Argument(..., help="Куда сохранить")
-):
-    BaseProject.create_layout(kind, dist, {"name": name})
-
-
-builder = typer.Typer()
-app.add_typer(builder, name="build", help="Сборка файлов")
-
-
-@builder.command(name="auto", help="Автоматическая сборка через setup.py")
-def buildAuto():
-    setup_file = Path.cwd() / "setup.py"
-    if not setup_file.exists():
-        typer.secho("Файл setup.py не найден. Используйте обычные команды.", fg="yellow")
-        return
-    
-    try:
-        subprocess.run([sys.executable, "setup.py"], check=True)
-        typer.secho("Билд завершен успешно", fg="green")
-    except Exception as e:
-        typer.secho(f"Ошибка: {e}", fg="red")
-        
-        
 @app.command(name="unpacked", help="Распаковка пакета")
 def appUnpacked(
         path_output: Path = typer.Argument(..., help="Путь домашней паки Overlay"),
@@ -56,10 +26,29 @@ def appUnpacked(
 ):
     try:
         for pack in plugin_packs:
-            unpacked(pack, path_output)
+            smart_unpacked(pack, path_output)
             typer.secho(f"Пакет успешно распакован {pack.stem}", fg=typer.colors.BRIGHT_GREEN)
     except Exception as e:
         typer.secho(f"Возникла ошибка: {e}", fg=typer.colors.RED)
+
+
+@app.command(name="build")
+def appBuild():
+    """Запускает сборку текущего проекта через setup.py"""
+    import subprocess
+    import sys
+    if Path("setup.py").exists():
+        subprocess.run([sys.executable, "setup.py", "build"])
+    else:
+        typer.secho("setup.py не найден!", fg="red")
+
+
+@app.command(name="new")
+def appNew(kind: str, name: str, path: Path = Path(".")):
+    """Создает новый проект с setup.py и шаблонами"""
+    BaseProject.create_layout(kind, path / name, {"name": name})
+    BaseProject.create_setup_file(kind, path / name, {"name": name})
+    typer.secho(f"Проект {name} ({kind}) готов!", fg="green")
 
 
 if __name__ == "__main__":
