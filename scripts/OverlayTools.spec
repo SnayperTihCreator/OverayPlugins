@@ -1,11 +1,13 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
 
 # noinspection PyUnusedImports
 from PyInstaller.building.build_main import Analysis, EXE, COLLECT, PYZ, logger
+BASE_DIR = os.path.dirname(SPECPATH)
 
 a = Analysis(
-    ['src/overlay_tools/overlay_tools.py'],
-    pathex=[],
+    [os.path.join(BASE_DIR, 'src', "overlay_tools",'overlay_tools.py')],
+    pathex=[os.path.join(BASE_DIR, 'src', "overlay_tools",)],
     binaries=[],
     datas=[],
     hiddenimports=[],
